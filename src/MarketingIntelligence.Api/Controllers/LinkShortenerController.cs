@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MarketingIntelligence.Api.Controllers;
 
 [ApiController]
-[Route("api/links")] // Base route for management
+[Route("api/links")]
 public class LinkShortenerController : ControllerBase
 {
     private readonly ILinkRepository _repository;
@@ -73,6 +73,16 @@ public class LinkShortenerController : ControllerBase
 
         // Analytics (Fire and forget or minimal wait)
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        
+        // Fallback for some proxy scenarios where ForwardedHeaders might not be fully configured or cleared
+        if (string.IsNullOrEmpty(ip) || ip == "::1") 
+        {
+             var header = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+             if (!string.IsNullOrEmpty(header))
+             {
+                 ip = header.Split(',')[0].Trim();
+             }
+        }
         var userAgent = HttpContext.Request.Headers.UserAgent.ToString();
 
         // Adding click asynchronously to not block redirect? 
