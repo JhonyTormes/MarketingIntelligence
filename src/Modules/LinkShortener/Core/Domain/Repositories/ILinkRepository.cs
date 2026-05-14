@@ -8,6 +8,8 @@ public interface ILinkRepository
     Task<ShortenedLink?> GetByOriginalUrlAsync(string originalUrl);
     Task AddAsync(ShortenedLink link);
     Task AddClickAsync(LinkClick click);
+    Task<LinkClick?> GetClickByIdAsync(Guid id); // Optional but good practice
+    Task<IEnumerable<LinkClick>> GetClicksByShortCodeAsync(string shortCode);
     Task<long> GetNextSequenceIdAsync();
     Task SaveChangesAsync();
 }

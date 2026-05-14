@@ -18,6 +18,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
                                Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
 });
 
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly);
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

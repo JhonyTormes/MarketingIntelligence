@@ -1,0 +1,65 @@
+<div class="dashboard-container">
+    <div class="header glass-panel">
+        <h1>Link Analytics</h1>
+        <div class="search-bar">
+            <input type="text" [(ngModel)]="shortCodeInput" placeholder="Enter Short Code (e.g. AbC12)"
+                (keydown.enter)="loadStats()">
+            <button class="btn-secondary" (click)="loadStats()" [disabled]="isLoading">
+                View Stats
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading analytics...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message glass-panel">
+        <p>⚠️ {{ errorMessage }}</p>
+    </div>
+
+    <div *ngIf="stats" class="stats-grid fade-in">
+        <!-- Overview Cards -->
+        <div class="card glass-panel highlight">
+            <h3>Total Clicks</h3>
+            <div class="big-number">{{ stats.totalClicks }}</div>
+        </div>
+
+        <div class="card glass-panel">
+            <h3>Original URL</h3>
+            <p class="truncate"><a [href]="stats.link.originalUrl" target="_blank">{{ stats.link.originalUrl }}</a></p>
+        </div>
+
+        <div class="card glass-panel">
+            <h3>Created At</h3>
+            <p>{{ stats.link.createdAt | date:'medium' }}</p>
+        </div>
+
+        <!-- Recent Clicks Table -->
+        <div class="card glass-panel full-width">
+            <h3>Recent Clicks</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>IP Address</th>
+                            <th>User Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let click of stats.recentClicks">
+                            <td>{{ click.clickedAt | date:'short' }}</td>
+                            <td>{{ click.ipAddress || 'Unknown' }}</td>
+                            <td class="truncate-cell" [title]="click.userAgent">{{ click.userAgent }}</td>
+                        </tr>
+                        <tr *ngIf="stats.recentClicks.length === 0">
+                            <td colspan="3" class="text-center">No clicks yet.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

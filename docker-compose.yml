@@ -1,0 +1,25 @@
+services:
+    postgres-db:
+        image: postgres:18
+        container_name: mi-postgres
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password123
+            POSTGRES_DB: marketing_intelligence
+            PGDATA: /var/lib/postgresql/data/pgdata
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql
+    rabbitmq:
+        image: rabbitmq:3-management
+        container_name: mi-rabbitmq
+        ports:
+          - "5672:5672"
+          - "15672:15672"
+        environment:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  postgres_data:

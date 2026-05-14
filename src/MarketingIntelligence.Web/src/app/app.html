@@ -1,0 +1,13 @@
+<nav class="glass-panel"
+  style="margin: 1rem; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+  <div style="font-weight: bold; font-size: 1.2rem;">🚀 MarketingIntelligence</div>
+  <div style="display: flex; gap: 1rem;">
+    <a routerLink="/link-shortener" routerLinkActive="active-link">Shortener</a>
+    <a routerLink="/link-shortener/dashboard" routerLinkActive="active-link">Analytics</a>
+    <a routerLink="/customers" routerLinkActive="active-link">Customers</a>
+  </div>
+</nav>
+
+<div class="container fade-in">
+  <router-outlet></router-outlet>
+</div>

@@ -109,3 +109,15 @@ appsettings.Development.json
 *.tmp
 *.log
 
+**/obj/
+**/bin/
+*.dgspec.json
+*.project.nuget.cache
+project.assets.json
+
+mcp.json
+agents.md
+.cursorrules
+.opencode
+.cursor
+docs

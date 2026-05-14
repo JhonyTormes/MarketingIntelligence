@@ -3,6 +3,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Services;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,18 @@ public static class LinkShortenerModuleServiceCollectionExtensions
 
         services.AddScoped<ILinkRepository, LinkRepository>();
         services.AddSingleton<IShorteningService, HashIdShorteningService>();
+
+        services.AddMassTransit(x =>
+        {
+            x.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host("localhost", "/", h =>
+                {
+                    h.Username("guest");
+                    h.Password("guest");
+                });
+            });
+        });
 
         return services;
     }

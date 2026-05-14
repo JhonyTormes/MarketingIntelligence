@@ -1,0 +1,30 @@
+<div class="create-link-container">
+  <div class="card glass-panel">
+    <h2>Create New Link</h2>
+    <p class="subtitle">Enter a long URL to generate a short, trackable link.</p>
+
+    <div class="input-group">
+      <input 
+        type="url" 
+        [(ngModel)]="originalUrl" 
+        placeholder="https://example.com/very-long-url..."
+        (keydown.enter)="shorten()"
+      >
+      <button class="btn-primary" (click)="shorten()" [disabled]="isLoading || !originalUrl">
+        <span *ngIf="!isLoading">Shorten</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+    </div>
+
+    <div *ngIf="shortenedUrl" class="result-area fade-in">
+      <label>Your Short Link:</label>
+      <div class="copy-box">
+        <input type="text" [value]="shortenedUrl" readonly>
+        <button class="btn-icon" (click)="copyToClipboard()">
+          <span *ngIf="!copySuccess">📋</span>
+          <span *ngIf="copySuccess">✅</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -36,6 +36,32 @@ public class LinkRepository : ILinkRepository
         await _context.LinkClicks.AddAsync(click);
     }
 
+
+    public async Task<LinkClick?> GetClickByIdAsync(Guid id)
+    {
+        return await _context.LinkClicks.FindAsync(id);
+    }
+
+    public async Task<IEnumerable<LinkClick>> GetClicksByShortCodeAsync(string shortCode)
+    {
+        // 1. Get Link ID (Optimization: select only ID)
+        var linkId = await _context.ShortenedLinks
+            .Where(l => l.ShortCode == shortCode)
+            .Select(l => l.Id)
+            .FirstOrDefaultAsync();
+
+        if (linkId == Guid.Empty)
+        {
+            return Enumerable.Empty<LinkClick>();
+        }
+
+        // 2. Get Clicks
+        return await _context.LinkClicks
+            .Where(c => c.ShortenedLinkId == linkId)
+            .OrderByDescending(c => c.ClickedAt)
+            .ToListAsync();
+    }
+
     public async Task<long> GetNextSequenceIdAsync()
     {
         var connection = _context.Database.GetDbConnection();
