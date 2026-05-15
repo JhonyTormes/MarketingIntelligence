@@ -12,11 +12,11 @@ public class LinkClick : Entity
     // EF Core constructor
     protected LinkClick() { }
 
-    public LinkClick(Guid linkId, string? ip, string? userAgent)
+    public LinkClick(Guid linkId, string? ip, string? userAgent, DateTime clickedAt)
     {
         ShortenedLinkId = linkId;
         IpAddress = ip;
         UserAgent = userAgent;
-        ClickedAt = DateTime.UtcNow;
+        ClickedAt = clickedAt;
     }
 }

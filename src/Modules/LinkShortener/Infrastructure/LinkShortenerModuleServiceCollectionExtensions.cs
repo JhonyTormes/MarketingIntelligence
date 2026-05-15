@@ -7,6 +7,7 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static MarketingIntelligence.Modules.LinkShortener.Infrastructure.Controllers.LinkShortenerController;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure;
 
@@ -23,6 +24,8 @@ public static class LinkShortenerModuleServiceCollectionExtensions
 
         services.AddMassTransit(x =>
         {
+            x.AddConsumer<LinkShortenerClickedConsumer>();
+
             x.UsingRabbitMq((context, cfg) =>
             {
                 cfg.Host("localhost", "/", h =>
@@ -30,6 +33,8 @@ public static class LinkShortenerModuleServiceCollectionExtensions
                     h.Username("guest");
                     h.Password("guest");
                 });
+
+                cfg.ConfigureEndpoints(context);
             });
         });
 
