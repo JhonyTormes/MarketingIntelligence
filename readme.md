@@ -5,6 +5,8 @@
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
 
+**Note:** The overengineering here is intentional for practicing purposes.
+
 Solução modular de análise e automação de processos de marketing desenvolvida em **.NET 9** e **Angular**. O projeto utiliza princípios de **Clean Architecture**, **SaaS Multi-tenant** e comunicação baseada em eventos.
 
 ## 🏛️ Arquitetura e Tech Stack
