@@ -25,10 +25,6 @@ h1{
     margin: 5px;
     color: #555;
 }
-input{
-    padding: 3px;
-    border: none;
-}
 button{
     padding: 8px;
     background-color: #007bff;
@@ -36,14 +32,6 @@ button{
     border: none;
     border-radius: 3px;
     margin-top: 5px;;
-}
-label{
-    font-weight: 700;
-    font-size: 14px;
-    color: #555;
-}
-.input-sublinhado{
-    border-bottom: solid 1px #007bff;
 }
 .nav{
     position: absolute;
@@ -61,7 +49,7 @@ label{
 }
 .DivLinksLogin {
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
     width: 100%;
     margin-top: 10px;
 }
@@ -71,11 +59,27 @@ label{
     color: #555; /* Cor roxa para combinar com sua nav */
 }
 .IconInput{
-    width: 15px;
+    width: 5%;
+    margin: 0px;
     height: 15px;
-    border: solid 1px #ddd;
 }
 .DivInputs{
-    display: flex;
-    border: solid 1px #ddd;
+
 }
+.div-input-sublinhado{
+    display: flex;
+    align-items: center;
+}
+.input-sublinhado{
+    border-bottom: solid 1px #007bff;
+    width: 91%;
+}
+input{
+    padding: 3px;
+    border: none;
+    outline: none;
+}
+/* #locker{
+    width: 6%;
+    height: 3%;
+} */
