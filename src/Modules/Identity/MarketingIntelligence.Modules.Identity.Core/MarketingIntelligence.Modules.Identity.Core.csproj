@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Identity\Services\" />
+    <Folder Include="Users\Services\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MarketingIntelligence.Shared\MarketingIntelligence.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
