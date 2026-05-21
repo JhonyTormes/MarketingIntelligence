@@ -1,4 +1,5 @@
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure;
+using MarketingIntelligence.Modules.Identity.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 
 // Register Modules
 builder.Services.AddLinkShortenerModule(builder.Configuration);
+builder.Services.AddIdentityModule(builder.Configuration);
 
 // Configure Forwarded Headers for Linux/Container hosting
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -20,6 +22,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly);
+
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(IdentityModuleServiceCollectionExtension).Assembly);
 
 
 var app = builder.Build();

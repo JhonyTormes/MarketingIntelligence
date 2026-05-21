@@ -31,6 +31,8 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Controllers
             var user = await _user.GetUserAsync(userId);
             if (user == null)
             {
+
+
                 return NotFound();
             }
             return Ok(user);
