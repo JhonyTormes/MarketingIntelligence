@@ -1,7 +1,6 @@
 # MarketingIntelligence
 
-[![EN](https://img.shields.io/badge/lang-EN-blue.svg)](README.md)
-[![PT-BR](https://img.shields.io/badge/lang-PT--BR-green.svg)](README.pt-BR.md)
+🇺🇸 [Click here for the English version](README.md)
 
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Angular](https://img.shields.io/badge/Angular-18-red.svg)](https://angular.io/)
