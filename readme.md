@@ -4,6 +4,7 @@
 [![Angular](https://img.shields.io/badge/Angular-18-red.svg)](https://angular.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
+[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+RabbitMQ-Enabled-orange.svg)](#)
 
 **Note:** The overengineering here is intentional for practicing purposes.
 
