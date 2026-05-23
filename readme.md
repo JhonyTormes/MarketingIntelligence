@@ -1,5 +1,8 @@
 # MarketingIntelligence
 
+[![EN](https://img.shields.io/badge/lang-EN-blue.svg)](README.md)
+[![PT-BR](https://img.shields.io/badge/lang-PT--BR-green.svg)](README.pt-BR.md)
+
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-blue.svg)](https://dotnet.microsoft.com/download/dotnet/9.0)
 [![Angular](https://img.shields.io/badge/Angular-18-red.svg)](https://angular.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
@@ -8,74 +11,90 @@
 
 **Note:** The overengineering here is intentional for practicing purposes.
 
-Solução modular de análise e automação de processos de marketing desenvolvida em **.NET 9** e **Angular**. O projeto utiliza princípios de **Clean Architecture**, **SaaS Multi-tenant** e comunicação baseada em eventos.
+A modular solution for marketing process analysis and automation developed in **.NET 9** and **Angular**. The project leverages **Clean Architecture**, **Multi-tenant SaaS** principles, and event-driven communication.
 
-## 🏛️ Arquitetura e Tech Stack
+## 🎯 The Business
 
-O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
+The main goal of **MarketingIntelligence** is to provide a centralized hub for marketing teams to manage, track, and optimize their campaigns. As a SaaS platform, it is designed to serve both agencies and companies needing autonomy over their marketing data, ensuring isolation (multi-tenancy) and scalability.
 
-*   **Back-end:** ASP.NET Core API (.NET 9).
-*   **Front-end:** Angular 18 (PWA) com build via Vite.
-*   **Mensageria:** RabbitMQ com MassTransit para integração entre módulos.
-*   **Persistência:** PostgreSQL com Entity Framework Core.
-*   **Inteligência:** Configurações de MCP (Model Context Protocol) e regras de design para desenvolvimento assistido por IA (Cursor/Gemini).
+### Key Capabilities (Business Modules)
 
-## 📂 Estrutura do Repositório
+* 🔗 **Link Tracking:** Parametrized URL creation with advanced metrics capture (geolocation, devices, referrers, UTMs) to measure campaign effectiveness.
+* 📊 **Analysis and Insights:** Real-time monitoring of marketing performance and engagement, consolidating data for better decision-making.
+* 🏢 **Multi-tenant Workspaces:** Isolated environments for different organizations or clients to manage their assets, campaigns, and users with full data security and privacy.
+* ⚙️ **Event-Driven Automation:** Workflows that react in real-time to user behavior (e.g., updating lead scores or notifying external systems when a strategic link is clicked).
+
+## 🏛️ Architecture and Tech Stack
+
+The ecosystem is designed to be scalable and decoupled, utilizing:
+
+* **Back-end:** ASP.NET Core API (.NET 9).
+* **Front-end:** Angular 18 (PWA) built with Vite.
+* **Messaging:** RabbitMQ with MassTransit for inter-module integration.
+* **Persistence:** PostgreSQL with Entity Framework Core.
+* **Intelligence:** MCP (Model Context Protocol) configurations and design rules for AI-assisted development (Cursor/Gemini).
+
+## 📂 Repository Structure
 
 ```bash
 ├── src/
-│   ├── MarketingIntelligence.Api/       # Entry-point da API e Host da aplicação
-│   ├── MarketingIntelligence.Web/       # SPA Angular (Front-end)
-│   ├── MarketingIntelligence.Shared/    # Core Shared (Result Pattern, Entities, Kernel)
-│   └── MarketingIntelligence.Modules/   # Módulos de Domínio (ex: LinkShortener)
-├── tests/                               # Testes unitários e de integração
-├── docs/                                # Documentação técnica e de banco de dados
-└── .cursor/rules/                       # Regras de arquitetura para assistentes de IA
-🚀 Como Começar
-Pré-requisitos
-.NET 9 SDK
+│   ├── MarketingIntelligence.Api/       # API entry point and application Host
+│   ├── MarketingIntelligence.Web/       # Angular SPA (Front-end)
+│   ├── MarketingIntelligence.Shared/    # Shared Core (Result Pattern, Entities, Kernel)
+│   └── MarketingIntelligence.Modules/   # Domain Modules (e.g., LinkShortener)
+├── tests/                               # Unit and integration tests
+├── docs/                                # Technical and database documentation
+└── .cursor/rules/                       # Architecture rules for AI assistants
+```
 
-Node.js (LTS)
+## 🚀 Getting Started
 
-Docker Desktop
+### Prerequisites
 
-Visual Studio 2022 ou VS Code
+* .NET 9 SDK
+* Node.js (LTS)
+* Docker Desktop
+* Visual Studio 2022 or VS Code
 
-Configuração do Ambiente
-Clone o repositório:
+### Environment Setup
 
-Bash
-git clone [https://github.com/seu-usuario/MarketingIntelligence.git](https://github.com/seu-usuario/MarketingIntelligence.git)
-cd MarketingIntelligence
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/your-username/MarketingIntelligence.git](https://github.com/your-username/MarketingIntelligence.git)
+    cd MarketingIntelligence
+    ```
 
-
-2.  **Suba a infraestrutura (PostgreSQL/RabbitMQ):**
+2.  **Spin up the infrastructure (PostgreSQL/RabbitMQ):**
     ```bash
     docker-compose up -d
-    
-Execute a API:
+    ```
 
-Bash
-dotnet run --project src/MarketingIntelligence.Api
+3.  **Run the API:**
+    ```bash
+    dotnet run --project src/MarketingIntelligence.Api
+    ```
 
-
-4.  **Execute o Front-end:**
+4.  **Run the Front-end:**
     ```bash
     cd src/MarketingIntelligence.Web
     npm install
     npm start
-    
-🛠️ Padrões de Desenvolvimento
-Result Pattern: Fluxos de negócio utilizam a classe Result para evitar exceções de controle.
+    ```
 
-Clean Architecture: Separação rigorosa entre as camadas de Domínio, Aplicação e Infraestrutura.
+## 🛠️ Development Standards
 
-Migrations: Utilize dotnet ef migrations add dentro do diretório do módulo correspondente para gerenciar o esquema do banco.
+* **Result Pattern:** Business workflows use the `Result` class to avoid control flow exceptions.
+* **Clean Architecture:** Strict separation between the Domain, Application, and Infrastructure layers.
+* **Migrations:** Use `dotnet ef migrations add` within the corresponding module directory to manage the database schema.
 
-🧪 Testes
-Para garantir a integridade dos módulos e das regras de negócio:
+## 🧪 Tests
 
-Bash
-# Executar todos os testes da solução
+To ensure the integrity of the modules and business rules:
+
+```bash
+# Run all tests in the solution
 dotnet test
-Este projeto é parte da suíte de inteligência para automação de workflows de marketing.
+```
+
+---
+*This project is part of the intelligence suite for marketing workflow automation.*
