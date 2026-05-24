@@ -18,17 +18,17 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repo
             _dbContext = dbContext;
         }
 
-        public async Task AddUserCredentialAsync(UserCredential userCredential)
+        public async Task AddAsync(UserCredential userCredential)
         {
             await _dbContext.UserCredentials.AddAsync(userCredential);
         }
 
-        public async Task<UserCredential> GetUserCredentialAsync(string userId)
+        public async Task<UserCredential> GetByIdAsync(string userId)
         {
             return await _dbContext.UserCredentials.FindAsync(userId);
         }
 
-        public async Task<UserCredential> GetUserCredentialByEmailAsync(string email)
+        public async Task<UserCredential> GetByEmailAsync(string email)
         {
             return await _dbContext.UserCredentials.FirstOrDefaultAsync(uc => uc.Email == email);
         }

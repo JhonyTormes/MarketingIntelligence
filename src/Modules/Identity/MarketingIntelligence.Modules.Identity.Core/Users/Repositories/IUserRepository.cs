@@ -5,7 +5,7 @@ namespace MarketingIntelligence.Modules.Identity.Core.Users.Repositories
 {
     public interface IUserRepository
     {
-        Task<User> GetUserAsync(string userId);
-        Task AddUserAsync(User user);
+        Task<User> GetByIdAsync(Guid userId);
+        Task AddAsync(User user);
     }
 }

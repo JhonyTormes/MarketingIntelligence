@@ -13,11 +13,12 @@ namespace MarketingIntelligence.Modules.Identity.Core.Users.Entities
         {
         }
 
-        public User(Guid id, string firstName, string lastName, string taxPayerId) : base(id)
+        public User(Guid id, string firstName, string lastName, string taxPayerId, string phoneNumber) : base(id)
         {
             FirstName = firstName;
             LastName = lastName;
             TaxPayerId = taxPayerId;
+            PhoneNumber = phoneNumber;
         }
     }
 }

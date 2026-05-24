@@ -4,8 +4,8 @@ namespace MarketingIntelligence.Modules.Identity.Core.Identity.Repositories
 {
     public interface IUserCredentialRepository
     {
-        Task<UserCredential> GetUserCredentialAsync(string userId);
-        Task<UserCredential> GetUserCredentialByEmailAsync(string email);
-        Task AddUserCredentialAsync(UserCredential userCredential);
+        Task<UserCredential> GetByIdAsync(string userId);
+        Task<UserCredential> GetByEmailAsync(string email);
+        Task AddAsync(UserCredential userCredential);
     }
 }

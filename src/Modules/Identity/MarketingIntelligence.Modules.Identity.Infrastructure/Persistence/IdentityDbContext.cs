@@ -1,10 +1,11 @@
 ﻿using MarketingIntelligence.Modules.Identity.Core.Identity.Entities;
+using MarketingIntelligence.Modules.Identity.Core.Shared;
 using MarketingIntelligence.Modules.Identity.Core.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MarketingIntelligence.Modules.Identity.Infrastructure.Persistence
 {
-    public class IdentityDbContext : DbContext
+    public class IdentityDbContext : DbContext, IUnitOfWork
     {
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {   

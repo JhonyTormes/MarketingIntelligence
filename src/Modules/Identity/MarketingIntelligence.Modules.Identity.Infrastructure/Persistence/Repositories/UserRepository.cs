@@ -12,12 +12,12 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repo
             _dbContext = dbContext;
         }
 
-        public async Task AddUserAsync(User user)
+        public async Task AddAsync(User user)
         {
             await _dbContext.Users.AddAsync(user);
         }
 
-        public async Task<User> GetUserAsync(string userId)
+        public async Task<User> GetByIdAsync(Guid userId)
         {
             return await _dbContext.Users.FindAsync(userId);
         }
