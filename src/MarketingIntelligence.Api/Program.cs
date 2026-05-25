@@ -26,6 +26,16 @@ builder.Services.AddControllers()
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(IdentityModuleServiceCollectionExtension).Assembly);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontEnd", policy =>
+    {
+        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 
 var app = builder.Build();
 
@@ -39,6 +49,8 @@ if (app.Environment.IsDevelopment())
 app.UseForwardedHeaders(); // Must be before other middleware
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontEnd");
 
 app.MapControllers();
 
