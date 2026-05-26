@@ -1,4 +1,5 @@
 ﻿using MarketingIntelligence.Modules.Identity.Core.Identity.Repositories;
+using MarketingIntelligence.Modules.Identity.Core.Identity.Services;
 using MarketingIntelligence.Modules.Identity.Core.Identity.Services.Interfaces;
 using MarketingIntelligence.Modules.Identity.Core.Users.Entities;
 using MarketingIntelligence.Modules.Identity.Core.Users.Repositories;
@@ -21,16 +22,19 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Controllers
         IUserCredentialRepository _userCredentialRepository;
         IUserRepository _userRepository;
         IRegisterUserService _registerUserService;
+        ILoginUserService _loginUserService;
 
         public IdentityController(ILogger<IdentityController> logger, 
             IUserCredentialRepository userCredentialRepository, 
             IUserRepository user,
-            IRegisterUserService registerUserService)
+            IRegisterUserService registerUserService,
+            ILoginUserService loginUserService)
         {
             _logger = logger;
             _userCredentialRepository = userCredentialRepository;
             _userRepository = user;
             _registerUserService = registerUserService;
+            _loginUserService = loginUserService;
         }
 
         [HttpGet("{userId}")]
@@ -57,6 +61,23 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Controllers
                 registerUserRequest.PhoneNumber);
 
             return CreatedAtAction(nameof(GetUser), new { userId = newUserId }, null);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        {
+            try
+            {
+                var token = await _loginUserService.LoginAsync(loginRequest.Email, loginRequest.Password);
+
+                // Return the token as a JSON object so the front-end can save it
+                return Ok(new { Token = token });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Return 401 Unauthorized if the password fails
+                return Unauthorized();
+            }
         }
     }
 }

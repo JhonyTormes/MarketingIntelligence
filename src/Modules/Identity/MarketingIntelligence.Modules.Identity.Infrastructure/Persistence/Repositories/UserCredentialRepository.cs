@@ -28,7 +28,7 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repo
             return await _dbContext.UserCredentials.FindAsync(userId);
         }
 
-        public async Task<UserCredential> GetByEmailAsync(string email)
+        public async Task<UserCredential?> GetByEmailAsync(string email)
         {
             return await _dbContext.UserCredentials.FirstOrDefaultAsync(uc => uc.Email == email);
         }
