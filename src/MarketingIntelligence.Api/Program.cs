@@ -1,5 +1,6 @@
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure;
 using MarketingIntelligence.Modules.Identity.Infrastructure;
+using MassTransit;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,31 @@ builder.Services.AddControllers();
 // Register Modules
 builder.Services.AddLinkShortenerModule(builder.Configuration);
 builder.Services.AddIdentityModule(builder.Configuration);
+
+var moduleAssemblies = new[]
+{
+    typeof(IdentityModuleServiceCollectionExtension).Assembly,
+    typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly
+};
+
+builder.Services.AddMassTransit(x =>
+{
+    x.SetKebabCaseEndpointNameFormatter();
+
+
+    x.AddConsumers(moduleAssemblies);
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 // Configure Forwarded Headers for Linux/Container hosting
 builder.Services.Configure<ForwardedHeadersOptions>(options =>

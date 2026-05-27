@@ -82,14 +82,6 @@ public class LinkShortenerController : ControllerBase
              }
         }
 
-        await publishEndpoint.Publish<ILinkShortenerClicked>(new
-        {
-            LinkId = link.Id,
-            IpAddress = ip,
-            UserAgent = userAgent,
-            ClickedAt = DateTime.UtcNow
-        });
-
         return Redirect(link.OriginalUrl);
     }
 

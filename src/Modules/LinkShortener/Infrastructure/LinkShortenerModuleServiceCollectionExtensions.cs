@@ -22,22 +22,6 @@ public static class LinkShortenerModuleServiceCollectionExtensions
         services.AddScoped<ILinkRepository, LinkRepository>();
         services.AddSingleton<IShorteningService, HashIdShorteningService>();
 
-        services.AddMassTransit(x =>
-        {
-            x.AddConsumer<LinkShortenerClickedConsumer>();
-
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host("localhost", "/", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
-
-                cfg.ConfigureEndpoints(context);
-            });
-        });
-
         return services;
     }
 }
