@@ -59,6 +59,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingIntelligence.Modules.Notification.Core", "src\Modules\Notification\MarketingIntelligence.Modules.Notification.Core\MarketingIntelligence.Modules.Notification.Core.csproj", "{C361F7F9-0495-445C-B82D-D8778496CEFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarketingIntelligence.Modules.Notification.Infrastructure", "src\Modules\Notification\MarketingIntelligence.Modules.Notification.Infrastructure\MarketingIntelligence.Modules.Notification.Infrastructure.csproj", "{82FA4A32-0B26-4840-B061-9C67CE993128}"
+	ProjectSection(ProjectDependencies) = postProject
+		{85B56244-E045-48BB-AC2F-F33DF4B6BE14} = {85B56244-E045-48BB-AC2F-F33DF4B6BE14}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

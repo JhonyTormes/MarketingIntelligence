@@ -22,6 +22,7 @@
     <ProjectReference Include="..\Modules\Identity\MarketingIntelligence.Modules.Identity.Infrastructure\MarketingIntelligence.Modules.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\LinkShortener\Core\MarketingIntelligence.Modules.LinkShortener.Core.csproj" />
     <ProjectReference Include="..\Modules\LinkShortener\Infrastructure\MarketingIntelligence.Modules.LinkShortener.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Notification\MarketingIntelligence.Modules.Notification.Infrastructure\MarketingIntelligence.Modules.Notification.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

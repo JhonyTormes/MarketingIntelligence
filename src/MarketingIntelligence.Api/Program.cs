@@ -1,6 +1,7 @@
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure;
 using MarketingIntelligence.Modules.Identity.Infrastructure;
 using MassTransit;
+using MarketingIntelligence.Modules.Notification.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +14,13 @@ builder.Services.AddControllers();
 // Register Modules
 builder.Services.AddLinkShortenerModule(builder.Configuration);
 builder.Services.AddIdentityModule(builder.Configuration);
+builder.Services.AddNotificationModule(builder.Configuration);
 
 var moduleAssemblies = new[]
 {
     typeof(IdentityModuleServiceCollectionExtension).Assembly,
-    typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly
+    typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly,
+    typeof(NotificationModuleServiceCollectionExtension).Assembly
 };
 
 builder.Services.AddMassTransit(x =>
