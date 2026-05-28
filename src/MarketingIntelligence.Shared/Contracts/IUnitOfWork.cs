@@ -1,4 +1,4 @@
-﻿namespace MarketingIntelligence.Modules.Identity.Core.Shared;
+﻿namespace MarketingIntelligence.Shared.Contracts;
 
 public interface IUnitOfWork
 {

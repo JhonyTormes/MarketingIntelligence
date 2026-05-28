@@ -1,13 +1,11 @@
 ﻿using MarketingIntelligence.Modules.Identity.Core.Identity.Repositories;
 using MarketingIntelligence.Modules.Identity.Core.Identity.Services;
 using MarketingIntelligence.Modules.Identity.Core.Identity.Services.Interfaces;
-using MarketingIntelligence.Modules.Identity.Core.Identity.Services.Interfaces;
-using MarketingIntelligence.Modules.Identity.Core.Shared;
 using MarketingIntelligence.Modules.Identity.Core.Users.Repositories;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Cryptography;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Persistence;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repositories;
-using MassTransit;
+using MarketingIntelligence.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

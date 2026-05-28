@@ -1,5 +1,5 @@
 ﻿using MarketingIntelligence.Modules.Identity.Core.Identity.Entities;
-using MarketingIntelligence.Modules.Identity.Core.Shared;
+using MarketingIntelligence.Shared.Contracts;
 using MarketingIntelligence.Modules.Identity.Core.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 

@@ -23,9 +23,7 @@ namespace MarketingIntelligence.Modules.Identity.Core.Identity.Services
         {
             var credential = await _userCredentialRepository.GetByEmailAsync(email);
 
-            //TODO: Need to remove the || password without hash, i just let it in the code because i'm not hashing the passwords to save yet.
-            //if (credential == null || (!_passwordHasher.Verify(password, credential.PasswordHash) || password != credential.PasswordHash))
-            if (credential == null || password != credential.PasswordHash)
+            if (credential == null || !_passwordHasher.Verify(password, credential.PasswordHash))
             {
                 throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
             }

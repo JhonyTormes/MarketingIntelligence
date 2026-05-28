@@ -43,10 +43,9 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Services
                     <p>Identificamos um novo login na sua conta. Abaixo estão os detalhes do acesso:</p>
             
                     <div style='background-color: #f8f9fa; padding: 15px; border-left: 4px solid #0056b3; margin: 20px 0;'>
-                        <p style='margin: 5px 0;'><strong>Data e Hora:</strong> {localLoginTime:dd/MM/yyyy HH:mm:ss} (Horário de Brasília)</p>
+                        <p style='margin: 5px 0;'><strong>Data e Hora:</strong> {localLoginTime:dd/MM/yyyy HH:mm:ss} </p>
                         <p style='margin: 5px 0;'><strong>Conta:</strong> {toEmail}</p>
                     </div>
-
                     <p style='color: #d9534f; font-weight: bold;'>Se não foi você, recomendamos que altere sua senha imediatamente.</p>
                 </div>
                 <div style='background-color: #f4f4f4; padding: 15px; text-align: center; font-size: 12px; color: #777777;'>
