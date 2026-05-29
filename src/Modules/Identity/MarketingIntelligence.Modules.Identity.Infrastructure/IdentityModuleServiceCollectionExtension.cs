@@ -3,6 +3,7 @@ using MarketingIntelligence.Modules.Identity.Core.Identity.Services;
 using MarketingIntelligence.Modules.Identity.Core.Identity.Services.Interfaces;
 using MarketingIntelligence.Modules.Identity.Core.Users.Repositories;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Cryptography;
+using MarketingIntelligence.Modules.Identity.Infrastructure.Messaging;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Persistence;
 using MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repositories;
 using MarketingIntelligence.Shared.Contracts;
@@ -30,7 +31,7 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure
             services.AddScoped<ILoginUserService, LoginUserService>();
             services.AddScoped<ITokenProvider, JwtTokenProvider>();
             services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
             return services;
         }
     }

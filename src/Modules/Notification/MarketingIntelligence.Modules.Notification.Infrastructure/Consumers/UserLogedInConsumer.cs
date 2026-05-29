@@ -5,7 +5,7 @@ using MarketingIntelligence.Shared.Contracts;
 
 namespace MarketingIntelligence.Modules.Notification.Infrastructure.Consumers
 {
-    public class UserLogedInConsumer : IConsumer<IUserLogedIn>
+    public class UserLogedInConsumer : IConsumer<UserLogedInEvent>
     {
         private readonly ILogger<UserLogedInConsumer> _logger;
         private readonly IEmailNotificationService _emailService;
@@ -18,7 +18,7 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Consumers
             _emailService = emailService;
         }
 
-        public async Task Consume(ConsumeContext<IUserLogedIn> context)
+        public async Task Consume(ConsumeContext<UserLogedInEvent> context)
         {
             var message = context.Message;
 

@@ -67,18 +67,11 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest, [FromServices] IPublishEndpoint publishEndpoint)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
             try
             {
                 var token = await _loginUserService.LoginAsync(loginRequest.Email, loginRequest.Password);
-
-                await publishEndpoint.Publish<IUserLogedIn>(new
-                {
-                    Name = loginRequest.Email,
-                    Email = loginRequest.Email,
-                    LogedInAt = DateTime.UtcNow
-                });
 
                 // Return the token as a JSON object so the front-end can save it
                 return Ok(new { Token = token });

@@ -1,5 +1,6 @@
 ﻿using MarketingIntelligence.Modules.Identity.Core.Users.Entities;
 using MarketingIntelligence.Modules.Identity.Core.Users.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace MarketingIntelligence.Modules.Identity.Infrastructure.Persistence.Repositories
 {
