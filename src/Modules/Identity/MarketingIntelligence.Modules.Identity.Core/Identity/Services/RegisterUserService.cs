@@ -11,17 +11,20 @@ public class RegisterUserService : IRegisterUserService
     private readonly IUserRepository _profileRepo;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IEventPublisher _eventPublisher;
 
     public RegisterUserService(
         IUserCredentialRepository credentialRepo,
         IUserRepository profileRepo,
         IUnitOfWork unitOfWork,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IEventPublisher eventPublisher)
     {
         _credentialRepo = credentialRepo;
         _profileRepo = profileRepo;
         _unitOfWork = unitOfWork;
         _passwordHasher = passwordHasher;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<Guid> RegisterAsync(string email, string password, string firstName, string lastName, string taxPayerId, string phoneNumber)
@@ -35,6 +38,13 @@ public class RegisterUserService : IRegisterUserService
         await _profileRepo.AddAsync(profile);
 
         await _unitOfWork.SaveChangesAsync();
+
+        await _eventPublisher.PublishAsync(new UserRegisteredEvent(
+            firstName, 
+            lastName, 
+            email, 
+            DateTime.Now
+        ));
 
         return credential.Id;
     }

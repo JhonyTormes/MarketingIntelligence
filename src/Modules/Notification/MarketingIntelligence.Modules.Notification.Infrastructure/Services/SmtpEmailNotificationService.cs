@@ -14,6 +14,54 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Services
             _configuration = configuration;
         }
 
+        public async Task SendWelcomeEmailAsync(string toEmail, string firstName, string lastName)
+        {
+            var host = _configuration["Smtp:Host"] ?? "localhost";
+            var port = int.Parse(_configuration["Smtp:Port"] ?? "25");
+            var username = _configuration["Smtp:Username"];
+            var password = _configuration["Smtp:Password"];
+
+            using var client = new SmtpClient(host, port)
+            {
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
+            };
+
+            string emailBody = $@"
+            <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;'>
+                <div style='background-color: #0056b3; padding: 20px; text-align: center;'>
+                    <h2 style='color: #ffffff; margin: 0;'>Marketing Intelligence</h2>
+                </div>
+                <div style='padding: 30px; background-color: #ffffff; color: #333333;'>
+                    <h3 style='margin-top: 0;'>Bem-vindo(a) à Marketing Intelligence!</h3>
+                    <p>Olá <strong>{firstName} {lastName}</strong>,</p>
+                    <p>Estamos muito felizes em tê-lo(a) conosco! Sua conta foi criada com sucesso e você agora faz parte da nossa comunidade de profissionais de marketing.</p>
+                    <p>Aqui estão algumas dicas para começar:</p>
+                    <ul>
+                        <li><strong>Explore a Plataforma:</strong> Navegue pelas nossas ferramentas e recursos para descobrir como podemos ajudar a otimizar suas campanhas de marketing.</li>
+                        <li><strong>Suporte Dedicado:</strong> Se tiver alguma dúvida ou precisar de ajuda, nossa equipe de suporte está sempre pronta para assisti-lo(a).</li>
+                        <li><strong>Fique Atualizado:</strong> Acompanhe nosso blog e redes sociais para ficar por dentro das últimas tendências e novidades do marketing digital.</li>
+                    </ul>
+                    <p>Estamos ansiosos para ver o que você vai conquistar com a Marketing Intelligence!</p>
+                </div>
+                <div style='background-color: #f4f4f4; padding: 15px'>" +
+                    "<p style='margin: 0;'>Este é um e-mail automático, por favor não responda.</p>" +
+                    $"<p style='margin: 5px 0;'>&copy; {DateTime.UtcNow.Year} Marketing Intelligence. Todos os direitos reservados.</p>";
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(username, "Marketing Intelligence"),
+                Subject = "Bem-vindo(a) à Marketing Intelligence!",
+                Body = emailBody,
+                IsBodyHtml = true
+            };
+
+            mailMessage.To.Add(toEmail);
+
+            await client.SendMailAsync(mailMessage);
+        }
+
+
         public async Task SendLoginAlertAsync(string toEmail, string userName, DateTime loginTime)
         {
 
