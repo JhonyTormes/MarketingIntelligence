@@ -4,6 +4,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
 using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 using MassTransit.Transports;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -87,6 +88,7 @@ public class LinkShortenerController : ControllerBase
 
 
     [HttpGet("{shortCode}/stats")]
+    [Authorize]
     public async Task<IActionResult> GetStats(string shortCode)
     {
         var link = await _repository.GetByShortCodeAsync(shortCode);
