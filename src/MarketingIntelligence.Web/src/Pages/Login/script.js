@@ -1,17 +1,23 @@
+const loginForm = document.getElementById('loginForm');
+
 document.getElementById('loginForm').addEventListener('submit', async function(event) {
 
     event.preventDefault();
 
-    const formData = new FormData(this);
-    const requestData = Object.fromEntries(formData.entries());
+    const emailValue = document.getElementById('email').value;
+    const passwordValue = document.getElementById('password').value;
 
     try {
+
         const response = await fetch('https://localhost:7118/api/identity/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ email: email, password: password })
+            body: JSON.stringify({ 
+                email: emailValue, 
+                password: passwordValue 
+            })
         });
 
         if (response.ok) {
@@ -19,10 +25,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             
             localStorage.setItem('jwtToken', data.token);
 
-            alert('Login efetuado com sucesso!');
-            
-            //Todo: Redirect the user to the logged-in area
-            // window.location.href = '/dashboard.html'; 
+            window.location.href = "../LinkShortener/index.html";
         } else {
             const errorData = await response.json();
             

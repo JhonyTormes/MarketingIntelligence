@@ -21,22 +21,96 @@ function renderLinks(){
     });
 }
 
-form.addEventListener('submit', function(event) {
+form.addEventListener('submit', async function(event) {
     event.preventDefault();
 
-    const randomCode = Math.random().toString(36).substring(2, 7);
-    const fakeShortUrl = 'mi.link/' + randomCode;
+    const originalUrlValue = inputOriginalUrl.value;
+    const campaignValue = inputCampaignName.value;
 
-    const newLinkData = {
-        campaign: inputCampaignName.value,
-        inputOriginalUrl: inputOriginalUrl.value,
-        shortUrl: fakeShortUrl,
-        clicks: 0 // Começa com zero cliques
-    };
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        alert("You must be logged in to shorten a link.");
+        window.location.href = "../Login/index.html";
+        return;
+    }
 
-    myLinks.unshift(newLinkData);
+    try {
+        const response = await fetch('https://localhost:7118/api/links', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Attach the JWT to identify the user
+            },
+            body: JSON.stringify({
+                originalUrl: originalUrlValue,
+                campaignName: campaignValue
+            })
+        });
 
-    renderLinks();
+        if (response.ok) {
+            const data = await response.json();
 
-    form.reset();
+            const realShortUrl = `https://localhost:7118/${data.shortCode}`;
+
+            const newLinkData = {
+                campaign: data.campaignName || campaignValue,
+                inputOriginalUrl: data.originalUrl,
+                shortUrl: realShortUrl,
+                clicks: 0 
+            };
+
+            myLinks.unshift(newLinkData);
+            renderLinks();
+            
+            form.reset();
+
+        } else {
+            const errorText = await response.text();
+            alert(`API Error: ${errorText}`);
+        }
+
+    } catch (error) {
+        console.error('Network Error:', error);
+        alert('Could not connect to the C# API. Is the server running?');
+    }
+});
+
+async function loadMyLinks() {
+    try {
+        const token = localStorage.getItem('jwtToken');
+
+        if (!token) {
+            window.location.href = "../Login/index.html";
+            return; 
+        }
+
+        const response = await fetch('https://localhost:7118/api/links', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            myLinks = data;
+            
+            renderLinks();
+            
+        } else if (response.status === 401) {
+            alert("Sua sessão expirou. Por favor, faça login novamente.");
+            localStorage.removeItem('jwtToken');
+            window.location.href = "../Login/index.html";
+        } else {
+            console.error("Erro da API ao buscar links.");
+        }
+    } catch (error) {
+        console.error("Erro de conexão. A API está rodando?", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadMyLinks();
 });

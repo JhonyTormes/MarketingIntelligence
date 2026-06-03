@@ -1,12 +1,12 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
-using MarketingIntelligence.Shared.Contracts;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MassTransit;
-using MassTransit.Transports;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 
 namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure.Controllers;
@@ -30,37 +30,40 @@ public class LinkShortenerController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Shorten([FromBody] string originalUrl)
+    [Authorize] 
+    public async Task<IActionResult> Shorten([FromBody] CreateShortLinkRequest request)
     {
-        if (string.IsNullOrWhiteSpace(originalUrl)) // Basic validation
+        if (string.IsNullOrWhiteSpace(request.OriginalUrl))
         {
             return BadRequest("URL cannot be empty.");
         }
-        
-        // TODO: Validate URL format
 
-        // Check availability/cache of original URL - Implementation choice: Create new one every time or reuse?
-        // Reuse is better for storage but requires lookup. Let's do lookup.
-        var existing = await _repository.GetByOriginalUrlAsync(originalUrl);
-        if (existing != null)
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (!Guid.TryParse(userIdString, out Guid userId))
         {
-            return Ok(new { ShortCode = existing.ShortCode, OriginalUrl = existing.OriginalUrl });
+            return Unauthorized();
         }
 
-        // Get next sequence ID
         var sequenceId = await _repository.GetNextSequenceIdAsync();
-
-        // Encode to Base62
         var shortCode = _shorteningService.Encode(sequenceId);
 
-        // Create Entity
-        var newLink = new ShortenedLink(originalUrl, sequenceId, shortCode);
+        var newLink = new ShortenedLink(
+            request.OriginalUrl,
+            sequenceId,
+            shortCode,
+            userId,
+            request.CampaignName
+        );
 
-        // Save
         await _repository.AddAsync(newLink);
         await _repository.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(RedirectToOriginal), new { shortCode = shortCode }, new { ShortCode = shortCode, OriginalUrl = originalUrl });
+        return CreatedAtAction(
+            nameof(RedirectToOriginal),
+            new { shortCode = shortCode },
+            new { ShortCode = shortCode, OriginalUrl = request.OriginalUrl, CampaignName = request.CampaignName }
+        );
     }
 
     [HttpGet("~/{shortCode}")]
