@@ -44,7 +44,6 @@ public class LinkRepository : ILinkRepository
 
     public async Task<IEnumerable<LinkClick>> GetClicksByShortCodeAsync(string shortCode)
     {
-        // 1. Get Link ID (Optimization: select only ID)
         var linkId = await _context.ShortenedLinks
             .Where(l => l.ShortCode == shortCode)
             .Select(l => l.Id)
@@ -75,5 +74,13 @@ public class LinkRepository : ILinkRepository
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<ShortenedLink>> GetAllByUserIdAsync(Guid userId)
+    {
+        return await _context.ShortenedLinks
+            .Where(l => l.UserId == userId)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
     }
 }

@@ -12,8 +12,8 @@ function renderLinks(){
         const newRow = `
             <tr>
                 <td>${linkItem.campaign}</td>
-                <td>${linkItem.inputOriginalUrl}</td>
-                <td><a href="#" style="color: #0056b3; font-weight: bold;">${linkItem.shortUrl}</a></td>
+                <td>${linkItem.originalUrl}</td> 
+                <td><a href="${linkItem.shortUrl}" target="_blank" style="color: #0056b3; font-weight: bold;">${linkItem.shortUrl}</a></td>
                 <td>${linkItem.clicks}</td>
             </tr>
         `;
@@ -54,7 +54,7 @@ form.addEventListener('submit', async function(event) {
 
             const newLinkData = {
                 campaign: data.campaignName || campaignValue,
-                inputOriginalUrl: data.originalUrl,
+                originalUrl: data.originalUrl,
                 shortUrl: realShortUrl,
                 clicks: 0 
             };

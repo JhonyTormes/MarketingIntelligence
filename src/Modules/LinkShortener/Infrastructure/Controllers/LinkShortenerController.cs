@@ -112,4 +112,28 @@ public class LinkShortenerController : ControllerBase
 
         return Ok(stats);
     }
+
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> GetMyLinks()
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (!Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized();
+        }
+
+        var myLinks = await _repository.GetAllByUserIdAsync(userId);
+
+        var responseData = myLinks.Select(link => new
+        {
+            campaign = link.CampaignName ?? "Sem Campanha",
+            originalUrl = link.OriginalUrl,
+            shortUrl = $"https://localhost:7118/{link.ShortCode}",
+            clicks = 0
+        });
+
+        return Ok(responseData);
+    }
 }
