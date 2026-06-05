@@ -3,7 +3,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 
-public class LinkShortenerClickedConsumer : IConsumer<ILinkShortenerClicked>
+public class LinkShortenerClickedConsumer : IConsumer<LinkShortenerClickedEvent>
 {
     private readonly ILinkRepository _repository;
 
@@ -12,7 +12,7 @@ public class LinkShortenerClickedConsumer : IConsumer<ILinkShortenerClicked>
         _repository = repository;
     }
 
-    public async Task Consume(ConsumeContext<ILinkShortenerClicked> context)
+    public async Task Consume(ConsumeContext<LinkShortenerClickedEvent> context)
     {
         var message = context.Message;
 

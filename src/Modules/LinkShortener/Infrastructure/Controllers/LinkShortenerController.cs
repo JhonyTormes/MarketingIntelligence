@@ -2,6 +2,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
+using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,15 +19,18 @@ public class LinkShortenerController : ControllerBase
     private readonly ILinkRepository _repository;
     private readonly IShorteningService _shorteningService;
     private readonly ILogger<LinkShortenerController> _logger;
+    private readonly IEventPublisher _eventPublisher;
 
     public LinkShortenerController(
         ILinkRepository repository,
         IShorteningService shorteningService,
-        ILogger<LinkShortenerController> logger)
+        ILogger<LinkShortenerController> logger,
+        IEventPublisher eventPublisher)
     {
         _repository = repository;
         _shorteningService = shorteningService;
         _logger = logger;
+        _eventPublisher = eventPublisher;
     }
 
     [HttpPost]
@@ -85,6 +89,15 @@ public class LinkShortenerController : ControllerBase
                  ip = header.Split(',')[0].Trim();
              }
         }
+
+        var clickEvent = new LinkShortenerClickedEvent(
+            link.Id,
+            ip ?? "Desconhecido", // Proteção extra caso o IP venha nulo
+            userAgent ?? "Desconhecido", // Proteção extra
+            DateTime.UtcNow
+        );
+
+        await _eventPublisher.PublishAsync(clickEvent);
 
         return Redirect(link.OriginalUrl);
     }

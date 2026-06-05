@@ -1,7 +1,7 @@
 ﻿using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 
-namespace MarketingIntelligence.Modules.Identity.Infrastructure.Messaging
+namespace MarketingIntelligence.Shared.Infrastructure.Messaging
 {
     public class MassTransitEventPublisher : IEventPublisher
     {
