@@ -1,6 +1,8 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence.Repositories;
@@ -82,5 +84,26 @@ public class LinkRepository : ILinkRepository
             .Where(l => l.UserId == userId)
             .OrderByDescending(l => l.CreatedAt)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<DashboardLinkDto>> GetDashboardLinksAsync(Guid userId)
+    {
+        return await _context.ShortenedLinks
+        .Where(link => link.UserId == userId)
+        .Select(link => new
+        {
+            CampaignName = link.CampaignName,
+            OriginalUrl = link.OriginalUrl,
+            ShortCode = link.ShortCode,
+            TotalClicks = _context.LinkClicks.Count(click => click.ShortenedLinkId == link.Id)
+        })
+        .OrderByDescending(x => x.TotalClicks)
+        .Select(x => new DashboardLinkDto(
+            x.CampaignName ?? "Sem Campanha",
+            x.OriginalUrl,
+            x.ShortCode,
+            x.TotalClicks
+        ))
+        .ToListAsync();
     }
 }

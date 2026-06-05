@@ -21,10 +21,10 @@ aside li{
     margin-bottom: 15px;
 }
 aside{
-    width: 250px;
+    width: 200px;
     background-color: #0056b3;
     color: white;
-    padding: 20px;
+    padding: 10px;
 }
 main{
     flex: 1;

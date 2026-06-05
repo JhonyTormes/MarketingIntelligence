@@ -1,6 +1,7 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
@@ -76,11 +77,9 @@ public class LinkShortenerController : ControllerBase
         var link = await _repository.GetByShortCodeAsync(shortCode);
         if (link == null) return NotFound();
 
-        // Analytics (Fire and forget or minimal wait)
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
-        // Fallback for some proxy scenarios where ForwardedHeaders might not be fully configured or cleared
         if (string.IsNullOrEmpty(ip) || ip == "::1") 
         {
              var header = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
@@ -92,14 +91,20 @@ public class LinkShortenerController : ControllerBase
 
         var clickEvent = new LinkShortenerClickedEvent(
             link.Id,
-            ip ?? "Desconhecido", // Proteção extra caso o IP venha nulo
-            userAgent ?? "Desconhecido", // Proteção extra
+            ip ?? "Desconhecido",
+            userAgent ?? "Desconhecido",
             DateTime.UtcNow
         );
 
         await _eventPublisher.PublishAsync(clickEvent);
 
-        return Redirect(link.OriginalUrl);
+        string linkReturn = string.Empty;
+        if (!link.OriginalUrl.StartsWith("http"))
+            linkReturn = "https://";
+
+        linkReturn += link.OriginalUrl;
+
+        return Redirect(linkReturn);
     }
 
 
@@ -116,14 +121,13 @@ public class LinkShortenerController : ControllerBase
         var clicks = await _repository.GetClicksByShortCodeAsync(shortCode);
 
         // Map to DTO if needed, for now returning entities (internal use) or anonymous
-        var stats = new
-        {
-            Link = new { link.ShortCode, link.OriginalUrl, link.CreatedAt },
-            TotalClicks = clicks.Count(),
-            RecentClicks = clicks.Take(50) // Limit for performance
-        };
+        var responseDto = new LinkStatsDto(
+          ShortCode: link.ShortCode,
+          OriginalUrl: link.OriginalUrl,
+          TotalClicks: clicks.Count()
+      );
 
-        return Ok(stats);
+        return Ok(responseDto);
     }
 
     [HttpGet]
@@ -137,14 +141,14 @@ public class LinkShortenerController : ControllerBase
             return Unauthorized();
         }
 
-        var myLinks = await _repository.GetAllByUserIdAsync(userId);
+        var myLinks = await _repository.GetDashboardLinksAsync(userId);
 
         var responseData = myLinks.Select(link => new
         {
             campaign = link.CampaignName ?? "Sem Campanha",
             originalUrl = link.OriginalUrl,
             shortUrl = $"https://localhost:7118/{link.ShortCode}",
-            clicks = 0
+            clicks = link.TotalClicks
         });
 
         return Ok(responseData);

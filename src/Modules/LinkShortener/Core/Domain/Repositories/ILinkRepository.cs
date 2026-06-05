@@ -1,4 +1,5 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 
@@ -13,4 +14,5 @@ public interface ILinkRepository
     Task<long> GetNextSequenceIdAsync();
     Task SaveChangesAsync();
     Task<IEnumerable<ShortenedLink>> GetAllByUserIdAsync(Guid userId);
+    Task<IEnumerable<DashboardLinkDto>> GetDashboardLinksAsync(Guid userId);
 }
