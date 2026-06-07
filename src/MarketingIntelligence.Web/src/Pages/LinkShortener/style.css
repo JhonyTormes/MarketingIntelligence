@@ -37,7 +37,7 @@ main{
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 10px;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 input{
     flex: 1;
@@ -75,4 +75,7 @@ th {
 }
 #list-item-rastreamento{
     font-weight: bold;
+}
+#refresh-button{
+    margin-bottom: 5px;
 }

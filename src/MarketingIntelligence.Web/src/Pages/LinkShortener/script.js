@@ -4,6 +4,7 @@ const form = document.getElementById('create-link-form');
 const tableBody = document.getElementById('links-table-body');
 const inputOriginalUrl = document.querySelector('input[name="Original-Url"]');
 const inputCampaignName = document.querySelector('input[name="Campaign-Name"]');
+const refreshButton = document.getElementById('refresh-button');
 
 function renderLinks(){
     tableBody.innerHTML = '';
@@ -76,8 +77,14 @@ form.addEventListener('submit', async function(event) {
 });
 
 async function loadMyLinks() {
+    const icon = document.querySelector('#refresh-button i')
+
     try {
+
+        if (icon) icon.classList.add('fa-spin');
+
         const token = localStorage.getItem('jwtToken');
+
 
         if (!token) {
             window.location.href = "../Login/index.html";
@@ -108,8 +115,12 @@ async function loadMyLinks() {
         }
     } catch (error) {
         console.error("Erro de conexão. A API está rodando?", error);
+    } finally{
+        if (icon) icon.classList.remove('fa-spin')
     }
 }
+
+refreshButton.addEventListener('click', loadMyLinks)
 
 document.addEventListener("DOMContentLoaded", () => {
     loadMyLinks();
