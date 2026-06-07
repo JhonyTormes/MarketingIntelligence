@@ -22,6 +22,11 @@ public static class LinkShortenerModuleServiceCollectionExtensions
         services.AddScoped<ILinkRepository, LinkRepository>();
         services.AddSingleton<IShorteningService, HashIdShorteningService>();
 
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis") ?? "localhost:6379";
+            options.InstanceName = "MI_LinkShortener_";
+        });
         return services;
     }
 }

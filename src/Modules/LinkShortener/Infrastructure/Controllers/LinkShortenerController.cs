@@ -7,6 +7,7 @@ using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
@@ -21,17 +22,20 @@ public class LinkShortenerController : ControllerBase
     private readonly IShorteningService _shorteningService;
     private readonly ILogger<LinkShortenerController> _logger;
     private readonly IEventPublisher _eventPublisher;
+    private readonly IDistributedCache _cache;
 
     public LinkShortenerController(
         ILinkRepository repository,
         IShorteningService shorteningService,
         ILogger<LinkShortenerController> logger,
-        IEventPublisher eventPublisher)
+        IEventPublisher eventPublisher,
+        IDistributedCache cache)
     {
         _repository = repository;
         _shorteningService = shorteningService;
         _logger = logger;
         _eventPublisher = eventPublisher;
+        _cache = cache;
     }
 
     [HttpPost]
@@ -74,37 +78,53 @@ public class LinkShortenerController : ControllerBase
     [HttpGet("~/{shortCode}")]
     public async Task<IActionResult> RedirectToOriginal(string shortCode, [FromServices] IPublishEndpoint publishEndpoint)
     {
-        var link = await _repository.GetByShortCodeAsync(shortCode);
-        if (link == null) return NotFound();
+        string cacheKey = $"link:{shortCode}";
+        string? cachedData = await _cache.GetStringAsync(cacheKey);
+
+        string originalUrl;
+        Guid linkId;
+
+        if (!string.IsNullOrEmpty(cachedData))
+        {
+            var parts = cachedData.Split('|', 2);
+            linkId = Guid.Parse(parts[0]);
+            originalUrl = parts[1];
+        }
+        else
+        {
+            var link = await _repository.GetByShortCodeAsync(shortCode);
+            if (link == null) return NotFound();
+
+            originalUrl = link.OriginalUrl;
+            linkId = link.Id;
+
+            string dataToCache = $"{linkId}|{originalUrl}";
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24)
+            };
+            await _cache.SetStringAsync(cacheKey, dataToCache, cacheOptions);
+        }
 
         var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
         var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
-        if (string.IsNullOrEmpty(ip) || ip == "::1") 
-        {
-             var header = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-             if (!string.IsNullOrEmpty(header))
-             {
-                 ip = header.Split(',')[0].Trim();
-             }
-        }
-
         var clickEvent = new LinkShortenerClickedEvent(
-            link.Id,
+            linkId,
+            shortCode,
             ip ?? "Desconhecido",
             userAgent ?? "Desconhecido",
             DateTime.UtcNow
         );
 
-        await _eventPublisher.PublishAsync(clickEvent);
+        await publishEndpoint.Publish(clickEvent);
 
-        string linkReturn = string.Empty;
-        if (!link.OriginalUrl.StartsWith("http"))
-            linkReturn = "https://";
+        if (!originalUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+        {
+            originalUrl = "https://" + originalUrl;
+        }
 
-        linkReturn += link.OriginalUrl;
-
-        return Redirect(linkReturn);
+        return Redirect(originalUrl);
     }
 
 

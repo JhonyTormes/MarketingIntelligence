@@ -6,7 +6,7 @@
 [![Angular](https://img.shields.io/badge/Angular-18-red.svg)](https://angular.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
-[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+RabbitMQ-Enabled-orange.svg)](#)
+[![Redis](https://img.shields.io/badge/Redis-Cache_Aside-dc382d.svg)](#)
 
 **Note:** The overengineering here is intentional for practicing purposes.
 
@@ -18,7 +18,7 @@ The main goal of **MarketingIntelligence** is to provide a centralized hub for m
 
 ### Key Capabilities (Business Modules)
 
-* 🔗 **Link Tracking:** Parametrized URL creation with advanced metrics capture (geolocation, devices, referrers, UTMs) to measure campaign effectiveness.
+* 🔗 **Link Tracking:** Parametrized URL creation with advanced metrics capture (geolocation, devices, referrers, UTMs) to measure campaign effectiveness. It features a high-performance redirect system using Redis with the Cache-Aside pattern.
 * 📊 **Analysis and Insights:** Real-time monitoring of marketing performance and engagement, consolidating data for better decision-making.
 * 🏢 **Multi-tenant Workspaces:** Isolated environments for different organizations or clients to manage their assets, campaigns, and users with full data security and privacy.
 * ⚙️ **Event-Driven Automation:** Workflows that react in real-time to user behavior (e.g., updating lead scores or notifying external systems when a strategic link is clicked).
