@@ -84,7 +84,7 @@ A API utiliza autenticação via **JWT Bearer**. Três endpoints de Identity est
 |--------|------|------|-----------|
 | `POST` | `/api/identity/createUser` | ❌ | Registrar novo usuário (retorna 201 Created) |
 | `POST` | `/api/identity/login` | ❌ | Autenticar e receber token JWT |
-| `GET` | `/api/identity/{userId}` | ❌ | Obter usuário por ID |
+| `GET` | `/api/identity/{userId}` | 🔒 JWT | Obter usuário por ID |
 
 O token JWT deve ser enviado no header `Authorization: Bearer <token>` nos endpoints protegidos. A configuração do token (Issuer, Audience, Secret) é armazenada em **User Secrets**.
 
@@ -104,11 +104,11 @@ Eventos são publicados via **MassTransit** no **RabbitMQ** e consumidos assincr
 |--------|------|------|--------|-----------|
 | `POST` | `/api/links` | 🔒 JWT | LinkShortener | Encurtar URL (opcionalmente com nome de campanha) |
 | `GET` | `/~{shortCode}` | ❌ | LinkShortener | Redirecionar para URL original (com cache Redis) |
-| `GET` | `/api/links/{shortCode}/stats` | 🔒 JWT | LinkShortener | Obter contagem de cliques de um link curto |
+| `GET` | `/api/links/{shortCode}/stats` | 🔒 JWT | LinkShortener | Retorna as estatísticas de um link encurtado |
 | `GET` | `/api/links` | 🔒 JWT | LinkShortener | Listar links do usuário atual com contagens de clique |
 | `POST` | `/api/identity/createUser` | ❌ | Identity | Registrar novo usuário |
 | `POST` | `/api/identity/login` | ❌ | Identity | Login — retorna token JWT |
-| `GET` | `/api/identity/{userId}` | ❌ | Identity | Obter detalhes do usuário |
+| `GET` | `/api/identity/{userId}` | 🔒 JWT | Identity | Obter detalhes do usuário |
 
 ## 🗄️ Configuração de Secrets
 

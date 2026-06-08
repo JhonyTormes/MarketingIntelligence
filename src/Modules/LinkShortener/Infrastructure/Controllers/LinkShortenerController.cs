@@ -132,8 +132,14 @@ public class LinkShortenerController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetStats(string shortCode)
     {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdString, out Guid userId))
+        {
+            return Unauthorized();
+        }
+
         var link = await _repository.GetByShortCodeAsync(shortCode);
-        if (link == null)
+        if (link == null || link.UserId != userId)
         {
             return NotFound();
         }

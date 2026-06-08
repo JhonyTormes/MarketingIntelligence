@@ -7,11 +7,13 @@ using MarketingIntelligence.Modules.Identity.Infrastructure.Models;
 using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
 using MassTransit.Transports;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,8 +43,20 @@ namespace MarketingIntelligence.Modules.Identity.Infrastructure.Controllers
         }
 
         [HttpGet("{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetUser(Guid userId)
         {
+            var authenticatedUserIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(authenticatedUserIdString, out Guid authenticatedUserId))
+            {
+                return Unauthorized(); // Or BadRequest, as the token is malformed.
+            }
+
+            if (authenticatedUserId != userId)
+            {
+                return Forbid(); // User is authenticated but not authorized to see this data.
+            }
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
