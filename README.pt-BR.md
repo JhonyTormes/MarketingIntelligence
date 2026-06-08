@@ -34,7 +34,7 @@ O principal objetivo do **MarketingIntelligence** é fornecer um hub centralizad
 O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 
 * **Back-end:** ASP.NET Core API (.NET 9) com Clean Architecture (Domínio → Aplicação → Infraestrutura).
-* **Front-end:** Angular 21 PWA (componentes standalone, build via Vite, Service Worker) com testes Vitest.
+* **Front-end:** A UI principal é construída com páginas vanilla HTML/CSS/JS para as funcionalidades centrais (Login, Cadastro, Encurtador de Link). Um projeto Angular 21 (build com Vite, testes com Vitest) também existe no repositório, servindo como scaffolding para migração futura.
 * **Autenticação:** Tokens JWT Bearer com issuer, audience e chave de assinatura configuráveis.
 * **Mensageria:** RabbitMQ com MassTransit para integração assíncrona entre módulos.
 * **Persistência:** PostgreSQL com Entity Framework Core — cada módulo possui seu próprio schema (`link_shortener`, `customers`, `socialmedia`, `finance`).
@@ -48,7 +48,9 @@ O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 ```bash
 ├── src/
 │   ├── MarketingIntelligence.Api/              # Entry-point da API e Host da aplicação
-│   ├── MarketingIntelligence.Web/              # PWA Angular 21 (Front-end)
+│   ├── MarketingIntelligence.Web/              # Front-end (HTML/JS Vanilla + Angular)
+│   │   ├── src/app/                          # Scaffolding do SPA Angular 21
+│   │   └── src/Pages/                        # Páginas HTML/CSS/JS Vanilla (Login, Register, etc)
 │   ├── MarketingIntelligence.Shared/           # Shared Kernel (Result Pattern, Entidade Base, Contratos)
 │   └── Modules/
 │       ├── LinkShortener/                      # Core + Infrastructure + Tests
@@ -159,17 +161,18 @@ dotnet user-secrets set "Smtp:Password" "sua-senha-smtp"
     ```
 
 5.  **Execute o Front-end:**
+    O front-end ativo consiste em páginas HTML vanilla. Você pode servi-las com um servidor HTTP simples ou uma extensão do VS Code como o Live Server a partir do diretório `src/MarketingIntelligence.Web/src/Pages/`.
+
+    Alternativamente, para trabalhar no scaffolding da aplicação Angular:
     ```bash
     cd src/MarketingIntelligence.Web
     npm install
     ng serve --proxy-config proxy.conf.json
     ```
 
-A API estará disponível em `http://localhost:5278` e o Swagger UI em `http://localhost:5278/swagger`. O front-end roda em `http://localhost:4200`.
+A API estará disponível em `http://localhost:5278` e o Swagger UI em `http://localhost:5278/swagger`. O front-end Angular roda em `http://localhost:4200`.
 
-## 📦 PWA
 
-O front-end é um **Progressive Web App** construído com o Service Worker do Angular (`ngsw-config.json`). Ele faz cache de assets estáticos (JS, CSS, fontes) para suporte offline e visitas repetidas mais rápidas.
 
 ## 🛠️ Padrões de Desenvolvimento
 
