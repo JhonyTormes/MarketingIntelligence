@@ -6,7 +6,7 @@
 [![Angular](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
-[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+RabbitMQ-Enabled-orange.svg)](#)
+[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+8.x+RabbitMQ-Enabled-orange.svg)](#)
 [![Redis](https://img.shields.io/badge/Redis-Cache_Aside-dc382d.svg)](#)
 [![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-ff69b4.svg)](#)
 
@@ -24,7 +24,7 @@ The main goal of **MarketingIntelligence** is to provide a centralized hub for m
 * 📊 **Analysis and Insights:** Real-time dashboard showing each link's click count and campaign metadata. Per-link statistics endpoint for deeper analysis.
 * 🔐 **Identity & Access:** User registration with BCrypt password hashing, JWT Bearer authentication, and secure login flow. User-scoped data isolation.
 * 📧 **Notifications:** Transactional email notifications triggered by domain events — welcome emails on registration, login alerts on account access.
-* 👥 **Customer Management:** Customer entity with `BrandIdentity` value object (JSONB), built for multi-tenant customer lifecycle management.
+* 👥 **Customer Management:** Full CRUD for customers (PF/PJ via TPH inheritance), addresses, and contacts. `BrandIdentity` value object stored as JSONB. Customer activation/deactivation workflow. Multi-tenant, user-scoped.
 * 📱 **Social Media Scheduling:** Post entity and scheduling commands (in development) for automated social media publishing.
 * 🏢 **Multi-tenant Workspaces:** Isolated environments for different organizations or clients to manage their assets, campaigns, and users with full data security and privacy.
 * ⚙️ **Event-Driven Automation:** Workflows that react in real-time to user behavior — updating click metrics, sending notifications, and integrating with external systems.
@@ -36,7 +36,7 @@ The ecosystem is designed to be scalable and decoupled, utilizing:
 * **Back-end:** ASP.NET Core API (.NET 9) with Clean Architecture (Domain → Application → Infrastructure).
 * **Front-end:** The primary UI is built with vanilla HTML/CSS/JS pages for core features (Login, Register, Link Shortener). An Angular 21 project (Vite build, Vitest tests) also exists in the repository, serving as scaffolding for future migration.
 * **Authentication:** JWT Bearer tokens with configurable issuer, audience, and signing key.
-* **Messaging:** RabbitMQ with MassTransit for asynchronous inter-module integration.
+* **Messaging:** RabbitMQ with MassTransit 8.x for asynchronous inter-module integration (9.x requires paid license).
 * **Persistence:** PostgreSQL with Entity Framework Core — each module owns its schema (`link_shortener`, `customers`, `socialmedia`, `finance`).
 * **Caching:** Redis with Cache-Aside pattern (24h TTL) for high-performance link redirects.
 * **Email:** SMTP client for transactional notifications (welcome emails, login alerts).
@@ -72,7 +72,7 @@ The ecosystem is designed to be scalable and decoupled, utilizing:
 | **LinkShortener** | ✅ Active | `link_shortener` | Core, Infrastructure, Tests | URL shortening, redirect with Redis cache, click tracking, per-link stats, campaign metadata |
 | **Identity** | ✅ Active | — | Core, Infrastructure | User registration (BCrypt), JWT login, user query |
 | **Notification** | ✅ Active | — | Core, Infrastructure | SMTP transactional emails — welcome, login alert — via MassTransit consumers |
-| **Customers** | 🟡 Partial | `customers` | Core, Infrastructure, Tests | Customer entity, `BrandIdentity` (JSONB), repository |
+| **Customers** | ✅ Active | `customers` | Core, Infrastructure, Tests | PF/PJ customer CRUD with TPH, addresses, contacts, `BrandIdentity` (JSONB), activate/deactivate, user-scoped controller |
 | **SocialMedia** | 🟡 In dev | — | Core, Infrastructure, Tests | `Post` entity, `SchedulePostCommand`/handler, `IPostRepository` |
 | **Finance** | ⬜ Scaffold | — | Core, Infrastructure | Empty projects ready for future billing/payment features |
 
@@ -109,19 +109,28 @@ Events are published via **MassTransit** to **RabbitMQ** and consumed asynchrono
 | `POST` | `/api/identity/createUser` | ❌ | Identity | Register a new user |
 | `POST` | `/api/identity/login` | ❌ | Identity | Login — returns JWT token |
 | `GET` | `/api/identity/{userId}` | 🔒 JWT | Identity | Get user details |
+| `POST` | `/api/customers` | 🔒 JWT | Customers | Create a customer (PF or PJ) |
+| `GET` | `/api/customers` | 🔒 JWT | Customers | List user's customers |
+| `GET` | `/api/customers/{id}` | 🔒 JWT | Customers | Get customer by ID |
+| `PUT` | `/api/customers/{id}` | 🔒 JWT | Customers | Update customer |
+| `DELETE` | `/api/customers/{id}` | 🔒 JWT | Customers | Delete customer |
+| `PATCH` | `/api/customers/{id}/activate` | 🔒 JWT | Customers | Activate customer |
+| `PATCH` | `/api/customers/{id}/deactivate` | 🔒 JWT | Customers | Deactivate customer |
 
 ## 🗄️ Secrets Configuration
 
 Sensitive settings are stored in **dotnet User Secrets** (never in `appsettings.json`):
 
+> ⚠️ All values below are **placeholders**. Never store real secrets in version-controlled files.
+
 ```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=marketing_intelligence;Username=postgres;Password=password123"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=marketing_intelligence;Username=postgres;Password=your-password"
 dotnet user-secrets set "Jwt:Secret" "your-256-bit-secret-key-here"
 dotnet user-secrets set "Jwt:Issuer" "MarketingIntelligence"
 dotnet user-secrets set "Jwt:Audience" "MarketingIntelligence"
 dotnet user-secrets set "Smtp:Host" "smtp.example.com"
 dotnet user-secrets set "Smtp:Port" "587"
-dotnet user-secrets set "Smtp:Username" "user@example.com"
+dotnet user-secrets set "Smtp:Username" "your-email@example.com"
 dotnet user-secrets set "Smtp:Password" "your-smtp-password"
 ```
 

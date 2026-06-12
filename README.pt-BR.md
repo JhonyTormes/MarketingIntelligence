@@ -6,7 +6,7 @@
 [![Angular](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean-green.svg)](#)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
-[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+RabbitMQ-Enabled-orange.svg)](#)
+[![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+8.x+RabbitMQ-Enabled-orange.svg)](#)
 [![Redis](https://img.shields.io/badge/Redis-Cache_Aside-dc382d.svg)](#)
 [![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-ff69b4.svg)](#)
 
@@ -24,7 +24,7 @@ O principal objetivo do **MarketingIntelligence** é fornecer um hub centralizad
 * 📊 **Análise e Insights:** Dashboard em tempo real exibindo contagem de cliques e metadados de campanha para cada link. Endpoint de estatísticas por link para análise aprofundada.
 * 🔐 **Identidade e Acesso:** Cadastro de usuários com hash BCrypt, autenticação via JWT Bearer e fluxo seguro de login. Isolamento de dados por usuário.
 * 📧 **Notificações:** Emails transacionais disparados por eventos de domínio — email de boas-vindas no registro, alerta de login no acesso à conta.
-* 👥 **Gestão de Clientes:** Entidade `Customer` com value object `BrandIdentity` (JSONB), construída para gestão multi-tenant do ciclo de vida do cliente.
+* 👥 **Gestão de Clientes:** CRUD completo de clientes (PF/PJ via herança TPH), endereços e contatos. Value Object `BrandIdentity` armazenado como JSONB. Fluxo de ativação/desativação de clientes. Multi-tenant, escopo por usuário.
 * 📱 **Agendamento para Redes Sociais:** Entidade `Post` e comandos de agendamento (em desenvolvimento) para publicação automatizada em redes sociais.
 * 🏢 **Workspaces Multi-tenant:** Ambientes isolados para diferentes organizações ou clientes gerenciarem seus próprios ativos, campanhas e usuários com total segurança e privacidade de dados.
 * ⚙️ **Automação Baseada em Eventos:** Fluxos de trabalho que reagem em tempo real ao comportamento do usuário — atualização de métricas de clique, envio de notificações e integração com sistemas externos.
@@ -36,7 +36,7 @@ O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 * **Back-end:** ASP.NET Core API (.NET 9) com Clean Architecture (Domínio → Aplicação → Infraestrutura).
 * **Front-end:** A UI principal é construída com páginas vanilla HTML/CSS/JS para as funcionalidades centrais (Login, Cadastro, Encurtador de Link). Um projeto Angular 21 (build com Vite, testes com Vitest) também existe no repositório, servindo como scaffolding para migração futura.
 * **Autenticação:** Tokens JWT Bearer com issuer, audience e chave de assinatura configuráveis.
-* **Mensageria:** RabbitMQ com MassTransit para integração assíncrona entre módulos.
+* **Mensageria:** RabbitMQ com MassTransit 8.x para integração assíncrona entre módulos (9.x exige licença paga).
 * **Persistência:** PostgreSQL com Entity Framework Core — cada módulo possui seu próprio schema (`link_shortener`, `customers`, `socialmedia`, `finance`).
 * **Cache:** Redis com padrão Cache-Aside (TTL de 24h) para redirecionamentos de alto desempenho.
 * **Email:** Cliente SMTP para notificações transacionais (boas-vindas, alerta de login).
@@ -72,7 +72,7 @@ O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 | **LinkShortener** | ✅ Ativo | `link_shortener` | Core, Infrastructure, Tests | Encurtamento de URLs, redirecionamento com cache Redis, rastreio de cliques, estatísticas por link, campanhas |
 | **Identity** | ✅ Ativo | — | Core, Infrastructure | Cadastro de usuários (BCrypt), login JWT, consulta de usuários |
 | **Notification** | ✅ Ativo | — | Core, Infrastructure | Emails transacionais SMTP — boas-vindas, alerta de login — via consumers MassTransit |
-| **Customers** | 🟡 Parcial | `customers` | Core, Infrastructure, Tests | Entidade `Customer`, `BrandIdentity` (JSONB), repositório |
+| **Customers** | ✅ Ativo | `customers` | Core, Infrastructure, Tests | CRUD de clientes PF/PJ com TPH, endereços, contatos, `BrandIdentity` (JSONB), ativar/desativar, controller por usuário |
 | **SocialMedia** | 🟡 Em dev | — | Core, Infrastructure, Tests | Entidade `Post`, `SchedulePostCommand`/handler, `IPostRepository` |
 | **Finance** | ⬜ Scaffold | — | Core, Infrastructure | Projetos vazios prontos para futuras funcionalidades de faturamento |
 
@@ -109,19 +109,28 @@ Eventos são publicados via **MassTransit** no **RabbitMQ** e consumidos assincr
 | `POST` | `/api/identity/createUser` | ❌ | Identity | Registrar novo usuário |
 | `POST` | `/api/identity/login` | ❌ | Identity | Login — retorna token JWT |
 | `GET` | `/api/identity/{userId}` | 🔒 JWT | Identity | Obter detalhes do usuário |
+| `POST` | `/api/customers` | 🔒 JWT | Customers | Criar cliente (PF ou PJ) |
+| `GET` | `/api/customers` | 🔒 JWT | Customers | Listar clientes do usuário |
+| `GET` | `/api/customers/{id}` | 🔒 JWT | Customers | Obter cliente por ID |
+| `PUT` | `/api/customers/{id}` | 🔒 JWT | Customers | Atualizar cliente |
+| `DELETE` | `/api/customers/{id}` | 🔒 JWT | Customers | Excluir cliente |
+| `PATCH` | `/api/customers/{id}/activate` | 🔒 JWT | Customers | Ativar cliente |
+| `PATCH` | `/api/customers/{id}/deactivate` | 🔒 JWT | Customers | Desativar cliente |
 
 ## 🗄️ Configuração de Secrets
 
 Configurações sensíveis são armazenadas em **dotnet User Secrets** (nunca em `appsettings.json`):
 
+> ⚠️ Todos os valores abaixo são **placeholders**. Nunca armazene secrets reais em arquivos versionados.
+
 ```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=marketing_intelligence;Username=postgres;Password=password123"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=marketing_intelligence;Username=postgres;Password=sua-senha"
 dotnet user-secrets set "Jwt:Secret" "sua-chave-secreta-de-256-bit"
 dotnet user-secrets set "Jwt:Issuer" "MarketingIntelligence"
 dotnet user-secrets set "Jwt:Audience" "MarketingIntelligence"
 dotnet user-secrets set "Smtp:Host" "smtp.example.com"
 dotnet user-secrets set "Smtp:Port" "587"
-dotnet user-secrets set "Smtp:Username" "user@example.com"
+dotnet user-secrets set "Smtp:Username" "seu-email@example.com"
 dotnet user-secrets set "Smtp:Password" "sua-senha-smtp"
 ```
 
