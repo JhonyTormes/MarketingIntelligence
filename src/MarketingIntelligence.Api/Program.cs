@@ -1,3 +1,4 @@
+using MarketingIntelligence.Modules.Customers.Infrastructure;
 using MarketingIntelligence.Modules.Identity.Infrastructure;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure;
 using MarketingIntelligence.Modules.Notification.Infrastructure;
@@ -62,12 +63,14 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddControllers();
 
 // Register Modules
+builder.Services.AddCustomersModule(builder.Configuration);
 builder.Services.AddLinkShortenerModule(builder.Configuration);
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddNotificationModule(builder.Configuration);
 
 var moduleAssemblies = new[]
 {
+    typeof(CustomersModuleServiceCollectionExtensions).Assembly,
     typeof(IdentityModuleServiceCollectionExtension).Assembly,
     typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly,
     typeof(NotificationModuleServiceCollectionExtension).Assembly
@@ -98,6 +101,9 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | 
                                Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
 });
+
+builder.Services.AddControllers()
+    .AddApplicationPart(typeof(CustomersModuleServiceCollectionExtensions).Assembly);
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(LinkShortenerModuleServiceCollectionExtensions).Assembly);
