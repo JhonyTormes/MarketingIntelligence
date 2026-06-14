@@ -1,5 +1,7 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence;
 
@@ -15,6 +17,10 @@ public class LinkShortenerDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("link_shortener");
+
+        modelBuilder.AddInboxStateEntity();
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
 
         modelBuilder.Entity<ShortenedLink>(entity =>
         {
