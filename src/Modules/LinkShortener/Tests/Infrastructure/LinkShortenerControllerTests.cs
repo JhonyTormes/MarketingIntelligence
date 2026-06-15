@@ -7,7 +7,6 @@ using MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
 using MarketingIntelligence.Shared.Contracts;
-using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -131,14 +130,13 @@ public class LinkShortenerControllerTests
     public async Task RedirectToOriginal_ShouldReturnNotFound_WhenLinkNotFound()
     {
         var shortCode = "nonexistent";
-        var publishEndpointMock = new Mock<IPublishEndpoint>();
 
         _cacheMock.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((byte[]?)null);
         _repositoryMock.Setup(r => r.GetByShortCodeAsync(shortCode))
             .ReturnsAsync((ShortenedLink?)null);
 
-        var result = await _controller.RedirectToOriginal(shortCode, publishEndpointMock.Object);
+        var result = await _controller.RedirectToOriginal(shortCode);
 
         result.Should().BeOfType<NotFoundResult>();
     }
@@ -149,7 +147,6 @@ public class LinkShortenerControllerTests
         var shortCode = "abc123";
         var linkId = Guid.NewGuid();
         var link = new ShortenedLink("https://example.com", 1L, shortCode, Guid.NewGuid(), "Camp");
-        var publishEndpointMock = new Mock<IPublishEndpoint>();
 
         _cacheMock.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((byte[]?)null);
@@ -161,12 +158,12 @@ public class LinkShortenerControllerTests
 
         _httpContextMock.Setup(c => c.Request.Headers["User-Agent"]).Returns("TestAgent");
 
-        var result = await _controller.RedirectToOriginal(shortCode, publishEndpointMock.Object);
+        var result = await _controller.RedirectToOriginal(shortCode);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
         redirectResult.Url.Should().Be("https://example.com");
         _repositoryMock.Verify(r => r.GetByShortCodeAsync(shortCode), Times.Once);
-        publishEndpointMock.Verify(p => p.Publish(It.IsAny<LinkShortenerClickedEvent>(), default), Times.Once);
+        _eventPublisherMock.Verify(p => p.PublishAsync(It.IsAny<LinkShortenerClickedEvent>()), Times.Once);
     }
 
     [Fact]
@@ -175,7 +172,6 @@ public class LinkShortenerControllerTests
         var shortCode = "abc123";
         var linkId = Guid.NewGuid();
         var cachedValue = $"{linkId}|https://example.com";
-        var publishEndpointMock = new Mock<IPublishEndpoint>();
 
         _cacheMock.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Encoding.UTF8.GetBytes(cachedValue));
@@ -186,12 +182,12 @@ public class LinkShortenerControllerTests
 
         _httpContextMock.Setup(c => c.Request.Headers["User-Agent"]).Returns("TestAgent");
 
-        var result = await _controller.RedirectToOriginal(shortCode, publishEndpointMock.Object);
+        var result = await _controller.RedirectToOriginal(shortCode);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
         redirectResult.Url.Should().Be("https://example.com");
         _repositoryMock.Verify(r => r.GetByShortCodeAsync(It.IsAny<string>()), Times.Never);
-        publishEndpointMock.Verify(p => p.Publish(It.IsAny<LinkShortenerClickedEvent>(), default), Times.Once);
+        _eventPublisherMock.Verify(p => p.PublishAsync(It.IsAny<LinkShortenerClickedEvent>()), Times.Once);
     }
 
     [Fact]
@@ -199,13 +195,12 @@ public class LinkShortenerControllerTests
     {
         var shortCode = "abc123";
         var link = new ShortenedLink("example.com", 1L, shortCode, Guid.NewGuid(), "Camp");
-        var publishEndpointMock = new Mock<IPublishEndpoint>();
 
         _cacheMock.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((byte[]?)null);
         _repositoryMock.Setup(r => r.GetByShortCodeAsync(shortCode)).ReturnsAsync(link);
 
-        var result = await _controller.RedirectToOriginal(shortCode, publishEndpointMock.Object);
+        var result = await _controller.RedirectToOriginal(shortCode);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
         redirectResult.Url.Should().Be("https://example.com");

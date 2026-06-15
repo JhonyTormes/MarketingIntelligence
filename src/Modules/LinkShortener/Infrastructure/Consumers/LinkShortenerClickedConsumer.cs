@@ -18,6 +18,6 @@ public class LinkShortenerClickedConsumer : IConsumer<LinkShortenerClickedEvent>
 
         var click = new LinkClick(message.LinkId, message.IpAddress, message.UserAgent, message.ClickedAt);
         await _repository.AddClickAsync(click);
-        _repository.SaveChangesAsync();
+        await _repository.SaveChangesAsync();
     }
 }

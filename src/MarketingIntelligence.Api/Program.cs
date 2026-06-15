@@ -1,6 +1,7 @@
 using MarketingIntelligence.Modules.Customers.Infrastructure;
 using MarketingIntelligence.Modules.Identity.Infrastructure;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence;
 using MarketingIntelligence.Modules.Notification.Infrastructure;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
@@ -80,8 +81,13 @@ builder.Services.AddMassTransit(x =>
 {
     x.SetKebabCaseEndpointNameFormatter();
 
-
     x.AddConsumers(moduleAssemblies);
+
+    x.AddEntityFrameworkOutbox<LinkShortenerDbContext>(o =>
+    {
+        o.UsePostgres();
+        o.QueryDelay = TimeSpan.FromSeconds(1);
+    });
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -91,6 +97,7 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
 
+        cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(10)));
         cfg.ConfigureEndpoints(context);
     });
 });

@@ -4,7 +4,6 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MarketingIntelligence.Shared.Contracts;
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -76,7 +75,7 @@ public class LinkShortenerController : ControllerBase
     }
 
     [HttpGet("~/{shortCode}")]
-    public async Task<IActionResult> RedirectToOriginal(string shortCode, [FromServices] IPublishEndpoint publishEndpoint)
+    public async Task<IActionResult> RedirectToOriginal(string shortCode)
     {
         string cacheKey = $"link:{shortCode}";
         string? cachedData = await _cache.GetStringAsync(cacheKey);
@@ -117,7 +116,7 @@ public class LinkShortenerController : ControllerBase
             DateTime.UtcNow
         );
 
-        await publishEndpoint.Publish(clickEvent);
+        await _eventPublisher.PublishAsync(clickEvent);
 
         if (!originalUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase))
         {
