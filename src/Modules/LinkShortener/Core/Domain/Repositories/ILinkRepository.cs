@@ -1,5 +1,5 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
-using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
+using MarketingIntelligence.Modules.LinkShortener.Core.Domain.DTOs;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 

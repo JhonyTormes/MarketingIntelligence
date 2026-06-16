@@ -3,7 +3,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Controllers;
-using MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
+using MarketingIntelligence.Modules.LinkShortener.Core.Domain.DTOs;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
 using MarketingIntelligence.Shared.Contracts;

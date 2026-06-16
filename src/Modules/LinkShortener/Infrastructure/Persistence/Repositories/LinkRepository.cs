@@ -1,7 +1,7 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Persistence;
-using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
+using MarketingIntelligence.Modules.LinkShortener.Core.Domain.DTOs;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 

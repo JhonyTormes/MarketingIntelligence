@@ -5,13 +5,13 @@ namespace MarketingIntelligence.Modules.Customers.Core.Domain.Entities;
 public class CustomerAddress : Entity
 {
     public Guid CustomerId { get; private set; }
-    public string Street { get; private set; }
-    public string Number { get; private set; }
+    public string Street { get; private set; } = null!;
+    public string Number { get; private set; } = null!;
     public string? Complement { get; private set; }
-    public string Neighborhood { get; private set; }
-    public string City { get; private set; }
-    public string State { get; private set; }
-    public string ZipCode { get; private set; }
+    public string Neighborhood { get; private set; } = null!;
+    public string City { get; private set; } = null!;
+    public string State { get; private set; } = null!;
+    public string ZipCode { get; private set; } = null!;
     public bool IsMain { get; private set; }
     public string? Label { get; private set; } // e.g. "Commercial", "Billing", "Shipping"
 

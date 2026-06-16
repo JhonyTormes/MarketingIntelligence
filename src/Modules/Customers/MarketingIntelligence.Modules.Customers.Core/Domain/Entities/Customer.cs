@@ -7,10 +7,10 @@ namespace MarketingIntelligence.Modules.Customers.Core.Domain.Entities;
 public class Customer : Entity
 {
     // Common fields for both PF (Individual) and PJ (Company)
-    public string Name { get; private set; }        // Full name (PF) / Legal name (PJ)
-    public string Email { get; private set; }
-    public string Phone { get; private set; }
-    public string TaxId { get; private set; }        // CPF (PF) / CNPJ (PJ)
+    public string Name { get; private set; } = null!;        // Full name (PF) / Legal name (PJ)
+    public string Email { get; private set; } = null!;
+    public string Phone { get; private set; } = null!;
+    public string TaxId { get; private set; } = null!;        // CPF (PF) / CNPJ (PJ)
     public CustomerType Type { get; private set; }
     public CustomerStatus Status { get; private set; }
     public string? Notes { get; private set; }

@@ -5,8 +5,8 @@ namespace MarketingIntelligence.Modules.Customers.Core.Domain.Entities;
 public class CustomerContact : Entity
 {
     public Guid CustomerId { get; private set; }
-    public string Name { get; private set; }
-    public string Email { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Email { get; private set; } = null!;
     public string? Phone { get; private set; }
     public string? Role { get; private set; } // e.g. "Owner", "Manager", "Accountant"
     public bool IsMain { get; private set; }

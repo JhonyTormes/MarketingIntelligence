@@ -7,7 +7,6 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using static MarketingIntelligence.Modules.LinkShortener.Infrastructure.Controllers.LinkShortenerController;
 
 namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure;
 

@@ -1,4 +1,4 @@
-﻿namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
+﻿namespace MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
 
 
 public record LinkStatsDto(

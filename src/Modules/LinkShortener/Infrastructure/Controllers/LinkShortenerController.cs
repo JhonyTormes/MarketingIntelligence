@@ -1,7 +1,7 @@
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Services;
-using MarketingIntelligence.Modules.LinkShortener.Infrastructure.DTOs;
+using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Responses;
 using MarketingIntelligence.Modules.LinkShortener.Infrastructure.Requests;
 using MarketingIntelligence.Shared.Contracts;
 using Microsoft.AspNetCore.Authorization;

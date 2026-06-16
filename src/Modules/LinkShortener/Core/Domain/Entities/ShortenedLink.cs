@@ -4,11 +4,11 @@ namespace MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 
 public class ShortenedLink : Entity
 {
-    public string OriginalUrl { get; private set; }
-    public string ShortCode { get; private set; }
+    public string OriginalUrl { get; private set; } = null!;
+    public string ShortCode { get; private set; } = null!;
     public long SequenceId { get; private set; } // O ID numérico usado para a Base62
     public Guid UserId { get; private set; }
-    public string CampaignName { get; private set; }
+    public string CampaignName { get; private set; } = null!;
 
     // EF Core constructor
     protected ShortenedLink() { }
