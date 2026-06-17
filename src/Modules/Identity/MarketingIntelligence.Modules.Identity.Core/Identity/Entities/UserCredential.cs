@@ -4,8 +4,8 @@ namespace MarketingIntelligence.Modules.Identity.Core.Identity.Entities
 {
     public class UserCredential : Entity
     {
-        public string Email { get; private set; }
-        public string PasswordHash { get; private set; }
+        public string Email { get; private set; } = null!;
+        public string PasswordHash { get; private set; } = null!;
         public bool IsTwoFactorEnabled { get; private set; }
         public bool IsLocked { get; set; }
         public DateTime LastLoginAt { get; private set; }
