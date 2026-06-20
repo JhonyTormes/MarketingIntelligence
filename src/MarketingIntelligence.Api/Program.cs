@@ -10,8 +10,53 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Logs;
+
+var resourceBuilder = ResourceBuilder.CreateDefault()
+    .AddService("MarketingIntelligence.Api");
 
 var builder = WebApplication.CreateBuilder(args);
+
+var otlpEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://127.0.0.1:4317";
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.IncludeFormattedMessage = true;
+    logging.IncludeScopes = true;
+    logging.SetResourceBuilder(resourceBuilder);
+    logging.AddOtlpExporter(opts =>
+    {
+        opts.Endpoint = new Uri(otlpEndpoint);
+    });
+});
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        tracing
+            .SetResourceBuilder(resourceBuilder)
+            .AddAspNetCoreInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation()
+            .AddSource("MassTransit")
+            .AddOtlpExporter(opts =>
+            {
+                opts.Endpoint = new Uri(otlpEndpoint);
+            });
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .SetResourceBuilder(resourceBuilder)
+            .AddAspNetCoreInstrumentation()
+            .AddMeter("MassTransit")
+            .AddOtlpExporter(opts =>
+            {
+                opts.Endpoint = new Uri(otlpEndpoint);
+            });
+    });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -86,7 +131,7 @@ builder.Services.AddMassTransit(x =>
     x.AddEntityFrameworkOutbox<LinkShortenerDbContext>(o =>
     {
         o.UsePostgres();
-        o.QueryDelay = TimeSpan.FromSeconds(1);
+        o.QueryDelay = TimeSpan.FromSeconds(10);
     });
 
     x.UsingRabbitMq((context, cfg) =>
@@ -122,7 +167,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontEnd", policy =>
     {
-        policy.WithOrigins("http://127.0.0.1:5500", "http://localhost:5500")
+        policy.WithOrigins("http://127.0.0.1:5501", "http://localhost:5501")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

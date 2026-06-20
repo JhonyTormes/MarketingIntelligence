@@ -8,6 +8,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Enabled-blue.svg)](#)
 [![MassTransit+RabbitMQ](https://img.shields.io/badge/MassTransit+8.x+RabbitMQ-Enabled-orange.svg)](#)
 [![Redis](https://img.shields.io/badge/Redis-Cache_Aside-dc382d.svg)](#)
+[![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-Aspire_Dashboard-7B42BC.svg)](#)
 [![JWT](https://img.shields.io/badge/Auth-JWT_Bearer-ff69b4.svg)](#)
 
 **Nota:** O overengineering aqui é intencional para fins de prática.
@@ -40,7 +41,8 @@ O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 * **Persistência:** PostgreSQL com Entity Framework Core — cada módulo possui seu próprio schema (`link_shortener`, `customers`, `socialmedia`, `finance`).
 * **Cache:** Redis com padrão Cache-Aside (TTL de 24h) para redirecionamentos de alto desempenho.
 * **Email:** Cliente SMTP para notificações transacionais (boas-vindas, alerta de login).
-* **Containers:** Docker Compose para desenvolvimento local — PostgreSQL 18, RabbitMQ 3, Redis 7.
+* **Containers:** Docker Compose para desenvolvimento local — PostgreSQL 18, RabbitMQ 3, Redis 7, Aspire Dashboard.
+* **Observabilidade:** SDK OpenTelemetry (traces, métricas, logs) exportando via OTLP para o Aspire Dashboard — logs via `ILogger`, traces via instrumentação ASP.NET Core + EF Core + MassTransit, métricas via ASP.NET Core + MassTransit.
 * **Inteligência:** Configurações de MCP (Model Context Protocol) e regras de design para desenvolvimento assistido por IA.
 
 ## 📂 Estrutura do Repositório
@@ -62,7 +64,7 @@ O ecossistema foi projetado para ser escalável e desacoplado, utilizando:
 ├── docs/                                       # Documentação técnica e de banco de dados
 ├── .github/workflows/                          # Pipelines CI/CD
 ├── AGENTS.md                                   # Guia do agente de desenvolvimento
-└── docker-compose.yml                          # PostgreSQL, RabbitMQ, Redis
+└── docker-compose.yml                          # PostgreSQL, RabbitMQ, Redis, Aspire Dashboard
 ```
 
 ## 📋 Módulos
@@ -117,6 +119,61 @@ Eventos são publicados via **MassTransit** no **RabbitMQ** e consumidos assincr
 | `PATCH` | `/api/customers/{id}/activate` | 🔒 JWT | Customers | Ativar cliente |
 | `PATCH` | `/api/customers/{id}/deactivate` | 🔒 JWT | Customers | Desativar cliente |
 
+## 📡 Observabilidade
+
+A API é instrumentada com **OpenTelemetry** e exporta telemetria para o **Aspire Dashboard** via protocolo OTLP.
+
+### Infraestrutura
+
+O `docker-compose.yml` executa o Aspire Dashboard como um contêiner autônomo (`mi-aspire-dashboard`):
+
+| Porta do contêiner | Descrição | Mapeamento no host |
+|-------------------|-----------|-------------------|
+| `18888` | UI do Dashboard | `18888` |
+| `18889` | Endpoint OTLP/gRPC | `4317` |
+| `18890` | Endpoint OTLP/HTTP | `4318` |
+
+As portas internas do contêiner (`18889`/`18890`) diferem das portas expostas no host (`4317`/`4318`). A API envia telemetria para `http://127.0.0.1:4317` (gRPC).
+
+### O que é monitorado
+
+| Sinal | Origem | Dados |
+|-------|--------|-------|
+| **Logs** | `ILogger` (todas as categorias) | Logs estruturados — inicialização, comandos DB, eventos do barramento MassTransit, processamento de requisições |
+| **Traces** | ASP.NET Core (`Microsoft.AspNetCore`) | Requisições HTTP — método, rota, status code, duração |
+| **Traces** | EF Core (`Microsoft.EntityFrameworkCore`) | Comandos de banco — SQL, parâmetros, duração |
+| **Traces** | MassTransit | Manipulação de mensagens — processamento de consumers, atividade do barramento |
+| **Métricas** | ASP.NET Core (`Microsoft.AspNetCore`) | Taxa de requisições HTTP, duração, conexões ativas |
+| **Métricas** | MassTransit | Taxa de entrega de mensagens, execução de consumers, status do barramento |
+
+### Configuração
+
+O endpoint OTLP é lido da variável de ambiente `OTEL_EXPORTER_OTLP_ENDPOINT`, com fallback para `http://127.0.0.1:4317`:
+
+```bash
+# Endpoint customizado (opcional, já definido via launchSettings.json)
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://127.0.0.1:4317
+```
+
+O recurso é nomeado `MarketingIntelligence.Api`. O nome do serviço é definido via `ResourceBuilder.CreateDefault().AddService("MarketingIntelligence.Api")`.
+
+### Acessando a telemetria
+
+Abra o Aspire Dashboard em [http://localhost:18888](http://localhost:18888):
+
+- **Logs Estruturados** → `http://localhost:18888/structuredlogs`
+- **Rastreamentos** → `http://localhost:18888/traces`
+- **Métricas** → `http://localhost:18888/metrics`
+
+### Pacotes NuGet
+
+```xml
+<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.16.0" />
+<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
+<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.15.1-beta.1" />
+```
+
 ## 🗄️ Configuração de Secrets
 
 Configurações sensíveis são armazenadas em **dotnet User Secrets** (nunca em `appsettings.json`):
@@ -151,7 +208,7 @@ dotnet user-secrets set "Smtp:Password" "sua-senha-smtp"
     cd MarketingIntelligence
     ```
 
-2.  **Suba a infraestrutura (PostgreSQL, RabbitMQ, Redis):**
+2.  **Suba a infraestrutura (PostgreSQL, RabbitMQ, Redis, Aspire Dashboard):**
     ```bash
     docker-compose up -d
     ```
