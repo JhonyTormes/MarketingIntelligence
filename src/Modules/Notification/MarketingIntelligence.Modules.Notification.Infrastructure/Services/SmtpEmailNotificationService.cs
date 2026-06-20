@@ -21,11 +21,7 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Services
             var username = _configuration["Smtp:Username"];
             var password = _configuration["Smtp:Password"];
 
-            using var client = new SmtpClient(host, port)
-            {
-                Credentials = new NetworkCredential(username, password),
-                EnableSsl = true
-            };
+            using var client = CreateSmtpClient(host, port, username, password);
 
             string emailBody = $@"
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;'>
@@ -58,27 +54,21 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Services
 
             mailMessage.To.Add(toEmail);
 
-            await client.SendMailAsync(mailMessage);
+            await SendEmailAsync(client, mailMessage);
         }
 
 
         public async Task SendLoginAlertAsync(string toEmail, string userName, DateTime loginTime)
         {
 
-            var timeZoneId = OperatingSystem.IsWindows() ? "E. South America Standard Time" : "America/Sao_Paulo";
-            var brasiliaTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-            var localLoginTime = TimeZoneInfo.ConvertTimeFromUtc(loginTime, brasiliaTimeZone);
+            var localLoginTime = ConvertToLocalTime(loginTime);
 
             var host = _configuration["Smtp:Host"] ?? "localhost";
             var port = int.Parse(_configuration["Smtp:Port"] ?? "25");
             var username = _configuration["Smtp:Username"];
             var password = _configuration["Smtp:Password"];
 
-            using var client = new SmtpClient(host, port)
-            {
-                Credentials = new NetworkCredential(username, password),
-                EnableSsl = true
-            };
+            using var client = CreateSmtpClient(host, port, username, password);
 
             string emailBody = $@"
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;'>
@@ -112,7 +102,28 @@ namespace MarketingIntelligence.Modules.Notification.Infrastructure.Services
 
             mailMessage.To.Add(toEmail);
 
-            await client.SendMailAsync(mailMessage);
+            await SendEmailAsync(client, mailMessage);
+        }
+
+        protected virtual DateTime ConvertToLocalTime(DateTime utcTime)
+        {
+            var timeZoneId = OperatingSystem.IsWindows() ? "E. South America Standard Time" : "America/Sao_Paulo";
+            var brasiliaTimeZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            return TimeZoneInfo.ConvertTimeFromUtc(utcTime, brasiliaTimeZone);
+        }
+
+        protected virtual Task SendEmailAsync(SmtpClient client, MailMessage message)
+        {
+            return client.SendMailAsync(message);
+        }
+
+        protected virtual SmtpClient CreateSmtpClient(string host, int port, string? username, string? password)
+        {
+            return new SmtpClient(host, port)
+            {
+                Credentials = new NetworkCredential(username, password),
+                EnableSsl = true
+            };
         }
     }
 }
