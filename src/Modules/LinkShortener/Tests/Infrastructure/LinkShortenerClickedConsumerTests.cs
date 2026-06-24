@@ -3,6 +3,7 @@ using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Entities;
 using MarketingIntelligence.Modules.LinkShortener.Core.Domain.Repositories;
 using MarketingIntelligence.Shared.Contracts;
 using MassTransit;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -11,12 +12,14 @@ namespace MarketingIntelligence.Modules.LinkShortener.Tests.Infrastructure;
 public class LinkShortenerClickedConsumerTests
 {
     private readonly Mock<ILinkRepository> _repositoryMock;
+    private readonly Mock<ILogger<LinkShortenerClickedConsumer>> _loggerMock;
     private readonly LinkShortenerClickedConsumer _consumer;
 
     public LinkShortenerClickedConsumerTests()
     {
         _repositoryMock = new Mock<ILinkRepository>();
-        _consumer = new LinkShortenerClickedConsumer(_repositoryMock.Object);
+        _loggerMock = new Mock<ILogger<LinkShortenerClickedConsumer>>();
+        _consumer = new LinkShortenerClickedConsumer(_repositoryMock.Object, _loggerMock.Object);
     }
 
     [Fact]
