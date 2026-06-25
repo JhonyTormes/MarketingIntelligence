@@ -38,7 +38,36 @@ services:
           - "4318:18890"  # OTLP HTTP endpoint (container listens on 18890)
         environment:
           - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
-          
+
+    mi-api:
+        image: mcr.microsoft.com/dotnet/sdk:9.0
+        container_name: mi-api
+        working_dir: /app
+        volumes:
+            - .:/app
+        ports:
+            - "5278:5278"
+        depends_on:
+            - postgres-db
+            - rabbitmq
+            - redis
+        command: >
+            sh -c "git pull origin main 2>/dev/null; dotnet run --project src/MarketingIntelligence.Api"
+        environment:
+            - ASPNETCORE_URLS=http://+:5278
+            - ASPNETCORE_ENVIRONMENT=Development
+            - ConnectionStrings__DefaultConnection=Host=postgres-db;Database=marketing_intelligence;Username=postgres;Password=password123
+            - ConnectionStrings__Redis=redis:6379
+            - RabbitMq__Host=rabbitmq
+            - OTEL_EXPORTER_OTLP_ENDPOINT=http://aspire-dashboard:18889
+            - Jwt__Secret=ChaveSuperSecreta123!@#ChaveSuperSecreta
+            - Jwt__Issuer=MarketingIntelligenceApi
+            - Jwt__Audience=MarketingIntelligenceApp
+            - Smtp__Host=mailhog
+            - Smtp__Port=1025
+            - Smtp__Username=
+            - Smtp__Password=
+
 volumes:
   postgres_data:
   redis_data:
