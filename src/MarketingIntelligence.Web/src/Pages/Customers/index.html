@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <aside>
+        <ul>
+            <li id="list-item-rastreamento"><a href="../LinkShortener/index.html">Rastreamento de links</a></li>
+            <li id="list-item-clientes"><a href="#">Clientes</a></li>
+        </ul>
+    </aside>
+    <main>
+        <div class="header-actions">
+            <h1>Clientes</h1>
+            <a class="btn btn-primary" href="create.html">Novo Cliente</a>
+            <button id="refresh-button" class="btn btn-secondary">
+                <i class="fas fa-sync-alt"></i> Atualizar
+            </button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>Tipo</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="customers-table-body"></tbody>
+        </table>
+    </main>
+</body>
+</html>
