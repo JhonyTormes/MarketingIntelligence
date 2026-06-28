@@ -50,6 +50,10 @@ main {
 .btn-secondary:hover {
     background-color: #5a6268;
 }
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
 .table {
     width: 100%;
     background: white;
@@ -64,6 +68,11 @@ main {
 .table th {
     background-color: #f1f3f5;
     color: #333;
+}
+.actions-cell {
+    white-space: nowrap;
+    display: flex;
+    gap: 5px;
 }
 #list-item-clientes{
     font-weight: bold;
